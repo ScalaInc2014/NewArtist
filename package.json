@@ -1,0 +1,24 @@
+{
+  "name": "NewArtist",
+  "version": "0.0.1",
+  "description": "It's a great application to share and discover new talents",
+  "main": "server.js",
+  "dependencies": {
+    "ejs": "^2.2.4",
+    "express": "^4.11.2"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "keywords": [
+    "Artist",
+    "Art",
+    "Talent",
+    "Fans",
+    "Fun"
+  ],
+  "author": "Scala",
+  "license": "ISC"
+}
