@@ -4,6 +4,7 @@ var server = express();
 
 server.use('/', global_routes.home);
 
-server.listen(3000, function(){
+server.listen(8080, function(){
 	console.log("NewArtist running in port 3000");
+	console.log("This is a test");
 });
