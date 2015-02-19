@@ -4,8 +4,12 @@
   "description": "It's a great application to share and discover new talents",
   "main": "server.js",
   "dependencies": {
+    "connect-flash": "^0.1.1",
     "ejs": "^2.2.4",
-    "express": "^4.11.2"
+    "express": "^4.11.2",
+    "mongoose": "^3.8.23",
+    "passport": "^0.2.1",
+    "passport-local": "^1.0.0"
   },
   "devDependencies": {},
   "scripts": {
