@@ -1,19 +1,21 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<title><%= title %></title>
-		<link rel='stylesheet' href='/stylesheets/style.css' />
+		<title>NEW ARTISTS</title>
+		<link rel='stylesheet' href='css/bootstrap.min.css'/>
+		<script  src='http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js'> </script>
+		<script  src='js/bootstrap.min.js'></script>
 	</head>
 
 	<body>
-		<% include menu %>
-		<h1><%= title %></h1>
-		<p>Registre sus datos!</p>
-	
+
+		<H1> Registre sus datos!</H1>
+		<p> <%= errorMessage %> </p>
+		<div> </div>
 		<form action="/signup" method="post">
 		    <div>
-		        <label>Nombre de Usuario:</label>
-		        <input type="text" name="username"/>
+		        <label>Correo electrónico:</label>
+		        <input type="text" name="email"/>
 		    </div>
 		    <div>
 		        <label>Contraseña:</label>

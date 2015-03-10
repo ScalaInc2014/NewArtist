@@ -1,20 +1,34 @@
 var LocalStrategy   = require('passport-local').Strategy;
+var Fan = require('../models/fan');
 
-
-module.exports = function(passport){
+var signup = new LocalStrategy(
     
+    { 
+        usernameField: 'email',
+        passReqToCallback : true 
+    },
 
-	passport.use('signup', new LocalStrategy(
+    function(req, email, password, done) {
 
-       
-        function(username, password, done) {
-
-           
-            console.log("username  " + username);
-            console.log(" password " + password)
+        Fan.registerUser(req, email, password, function(err, fan){
+            
+            
+            if(err) 
+                return done(err);
+            
+            if(fan){
+               done(null, fan);
+            }
+            
+            else{
+               done(null, false, {message: 'The User Already exists!!!!!!!!'});
+                
+            }
+            
+        });
         
-            return done(null, 1 );
-        })
-    );
+        
 
-}
+    });
+            
+module.exports = signup;
