@@ -39,7 +39,7 @@ var fanSchema = new Schema({
 
 fanSchema.statics.verifyUser = function (email, callback){
     
-    this.find({
+    this.findOne({
         'info.email':email
     }, 
     
@@ -107,7 +107,7 @@ var fanSave = function (email, hashPassword, callback){
 
 fanSchema.statics.registerUser = function (req, email, password, callback){
     
-    var self = this;
+     var self = this;
 
      self.verifyUser(email, function(err,verify){
          
