@@ -1,7 +1,7 @@
 // -------------- Npm and node dependencies ---------------------------//
 var bodyParser = require('body-parser'); // Middleware to parse different data formats
 var express = require("express");
-var cookieParser = require("cookie-parser"); // Middleware to parse Cookie and populate req.cookies.
+//var cookieParser = require("cookie-parser"); // Middleware to parse Cookie and populate req.cookies.
 var session = require("express-session"); // Sets up an HTTP session for a user and provides a persistent req.session object in between requests. Depends on cookieParser.
 var flash = require("connect-flash");  // Middleware used for storing messages in req-
 var passport = require("passport");
@@ -27,8 +27,8 @@ server.set('view engine', 'ejs');
 server.use(bodyParser.urlencoded({ extended : true }));   
 server.use(passport.initialize()); 
 
-server.use(cookieParser('keyboard cat')); // Signed Cookies in order to work with Express.session
-server.use(session()); 
+//server.use(cookieParser('keyboard cat')); // Signed Cookies in order to work with Express.session
+server.use(session({secret:'keyboard cat'})); 
 server.use(flash());
 
 // Strategies and configurations are set up

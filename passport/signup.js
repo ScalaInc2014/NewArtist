@@ -27,8 +27,6 @@ var signup = new LocalStrategy(
             
         });
         
-        
-
     });
             
 module.exports = signup;
