@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>NEW ARTISTS</title>
+		<link rel='stylesheet' href='/bootstrap/css/bootstrap.min.css'/>
+		<script  src='http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js'> </script>
+		<script  src='/bootstrap/js/bootstrap.min.js'></script>
+	</head>
+
+	<body>
+
+		<H1> Te hemos enviado un Correo de Verificación</H1>
+		<p> Por favor Ingresa a tu correo y valída tu cuenta por medio del Link suministrado </p>
+		<p> {errorMessage} </p>
+		<div> </div>
+
+	</body>
+</html>
+

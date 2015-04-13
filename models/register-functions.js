@@ -1,78 +1,103 @@
 var bcrypt = require("bcrypt");
-//var mongoose = require('mongoose');
-var mongoose = require('./mongoose');
+var mongoose = require('mongoose');
+var Q = require('q');
+
 
 var hashPassword = function (next) {
-    
-    
-    console.log("Hashpassword");
+
     var document = this;
-    bcrypt.genSalt(10, function (err, salt) {
-        
-        if(err)  
-            return next(err);
-        
-        bcrypt.hash(document.info.password, salt, function (err, hash) {
-            
-            if(err) 
-                return next(err);
+    var bcryptGenSalt = Q.denodeify(bcrypt.genSalt);
+    var GenSaltPromise = bcryptGenSalt(10);
+    
+    GenSaltPromise
+
+        .then(function(salt){
+
+            document.info.salt = salt;
+            var bcryptHash = Q.denodeify(bcrypt.hash);
+            return bcryptHash(document.info.password, salt);
+
+        })
+
+        .then (function(hash){
+
             document.info.password = hash;
             next();
-        });
-        
-    });
+        })
+
+        .then(null,function(err){
+            
+            next(err);
+        }); 
 };
 
-var registerUser = function (req, email, password, callback){
+var userSavePromise = function (newUserObject){
+
+
+    var deferred = Q.defer();
     
-    console.log("Funcion Register User");
-    var self = this;
-    var Id = mongoose.Types.ObjectId();
-    
-    console.log(self.collection.name);
-    
-    self.findOne({
-        'info.email': email
-    }, 
-    
-    function(err, user){
-        
+    var newUser = new this(newUserObject);
+
+    newUser.save(function(err){
+
         if(err) 
-            return callback(err);
+            return deferred.reject(err);
+  
+        var userSaved = {
             
-        //console.log(user);
-        
-        // User´s email  does not exists in Collection
-        if(user) 
-            callback(null, false);
-        else{
-            var newUser = new self({
-        
-                fanId: Id,
-                info:{
-                    name: req.body.name,
-                    password: req.body.password,
-                    email: req.body.email,
-                    birthday: req.body.birthday,
-                    gender: req.body.gender,
-                    avatarPath: 'http://www.nocturnar.com/forum/attachments/fondos-de-pantalla/28575d1338158805-paisajes-hermosos-fondo-de-pantalla-paisajes_hermosos_del_mundo2.jpg',
-                    location: req.body.location
-                }
-            });
+            token: newUser.token,
+            email: newUser.info.email
             
-            newUser.save(function(err){
-        
-                if(err) 
-                    return callback(err);
-                console.log("FAN SUCCESSFULLY SAVED IN  COLLECTION FANS")
-                callback(null, newUser);
-        
-            });
-        }
-    });
+        };
+        console.log("USER SUCCESSFULLY SAVED IN  COLLECTION ");
+        deferred.resolve(userSaved);
+    });   
+
+    return deferred.promise; 
 };
+
+var registerPromise = function (newUserObject){
+    
+   
+    var deferred = Q.defer();
+    var self = this;   
+    var query = self.findOne({ 'info.email': newUserObject.info.email});
+    var verifyUserPromise = query.exec();
+
+    verifyUserPromise
+
+        .then(function(user){
+
+            if(user)
+                return deferred.resolve(false);
+            else{
+
+                self.userSavePromise(newUserObject)
+
+                    .then(function(userSaved){
+
+                       return deferred.resolve(userSaved);
+                    });
+            }
+
+        })
+
+        .then(null, function(err){
+
+            return deferred.reject(err);
+        }); 
+        
+   return deferred.promise; 
+};
+
+
 
 module.exports = {
-    hashPassword: hashPassword,
-    registerUser: registerUser
+    statics: {
+        registerPromise: registerPromise,
+        userSavePromise: userSavePromise
+    },
+    saveMiddlewares: {
+        hashPassword: hashPassword
+    }
 }

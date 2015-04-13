@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>{title}</title>
+		<link rel='stylesheet' href='/bootstrap/css/bootstrap.min.css'/>
+		<link rel='stylesheet' href='/stylesheets/style.css'/>
+		<script  src='http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js'> </script>
+		<script  src='/bootstrap/js/bootstrap.min.js'></script>
+	</head>
+ 	<body>
+ 		
+ 		{#session}
+ 		 	
+ 		 	<div id='menu'>
+				<span class='name'>{info.name}</span>
+				<a href='/logout'>logout</a>
+			</div>
+
+ 	    {:else}
+ 	     	
+ 	     	<div id='menu'>
+ 	     		<a href='/authentication/login'>Iniciar Sesión</a> 
+ 	     		<a href='/authentication/signup/fan'>Registro Fans</a>  
+ 	     		<a href='/authentication/signup/artist'>Registro Artistas</a> 
+ 	     	</div>
+ 	    {/session}
+ 	     
+  	</body>
+</html>

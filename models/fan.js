@@ -1,7 +1,7 @@
 var mongoose = require('./mongoose');
 var Schema = mongoose.Schema;
 var registerFunctions = require('./register-functions');
-
+var loginFunctions = require('./login-functions');
 
 var historyItem = new Schema({
     
@@ -17,6 +17,7 @@ var fanSchema = new Schema({
          
             name: String,
             password: String,
+            salt: String,
             email: String,
             birthday: Date,
             gender: String,
@@ -25,6 +26,7 @@ var fanSchema = new Schema({
             
         },
         token: String,
+        mailConfirmation: { type: Boolean, default: false },
         preferences:[Schema.Types.ObjectId], 
         history:[historyItem], // Json Array {contenido_id,fecha_reproduccion:"Date"}
         favouriteArtists:[Schema.Types.ObjectId],
@@ -37,10 +39,11 @@ var fanSchema = new Schema({
         
 });
 
-fanSchema.pre('save', registerFunctions.hashPassword);
+fanSchema.pre('save', registerFunctions.saveMiddlewares.hashPassword);
+fanSchema.statics = registerFunctions.statics;
+fanSchema.methods = loginFunctions.methods;
 
-fanSchema.statics.registerUser = registerFunctions.registerUser ;
 
 var Fan = mongoose.model('Fan', fanSchema); 
 
-module.exports = Fan; 
+module.exports = Fan;

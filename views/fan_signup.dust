@@ -2,17 +2,17 @@
 <html>
 	<head>
 		<title>NEW ARTISTS</title>
-		<link rel='stylesheet' href='css/bootstrap.min.css'/>
+		<link rel='stylesheet' href='/bootstrap/css/bootstrap.min.css'/>
 		<script  src='http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js'> </script>
-		<script  src='js/bootstrap.min.js'></script>
+		<script  src='/bootstrap/js/bootstrap.min.js'></script>
 	</head>
 
 	<body>
 
 		<H1> Registre sus datos!</H1>
-		<p> <%= errorMessage %> </p>
+		<p> {errorMessage} </p>
 		<div> </div>
-		<form action="/signup" method="post">
+		<form action="/authentication/signup/fan" method="post">
 		    <div>
 		        <label>Correo electrónico:</label>
 		        <input type="text" name="email"/>

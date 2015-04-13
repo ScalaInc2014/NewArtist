@@ -1,5 +1,5 @@
 var LocalStrategy   = require('passport-local').Strategy;
-var Fan = require('../models/fan');
+
 
 var signup = new LocalStrategy(
     

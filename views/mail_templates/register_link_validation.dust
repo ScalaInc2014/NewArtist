@@ -1,12 +1,16 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<title><%= title %></title>
+		<title>'Validación Correo Electrónico'</title>
 		<link rel='stylesheet' href='/css/bootstrap.min.css'/>
 		<script  src='http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js'> </script>
 		<script  src='/js/bootstrap.min.js'></script>
 	</head>
  	<body>
- 	      <a href='/signup'>Registro</a>
+ 		
+	<p> Para verificar tu cuenta en New Artists ingresa al siguiente link: </p> 
+
+		<a href= {confirmationLink} >Validar Cuenta </a>
+ 	     
   	</body>
 </html>
