@@ -1,37 +1,34 @@
 var bcrypt = require("bcrypt");
-var mongoose = require('mongoose');
 var Q = require('q');
 
 
-var validPassword = function (password) {
+var validPasswordPromise = function (password) {
 
+    var deferred = Q.defer();
     var document = this;
-    console.log("Password: " + password);
     var hashPromise = Q.denodeify(bcrypt.hash);
 
-    var loggedin = hashPromise(password, document.info.salt)
+    hashPromise(password, document.info.salt)
 
         .then(function(hash){
 
             if(hash === document.info.password)
-                return true;
-                
-            return false;
+                 deferred.resolve(true);
+
+            deferred.resolve(false);
         })
-
-        .then(null,function(err){
-            
-            console.log(err);
-        }); 
         
-    return loggedin;
+        .catch(function(err){
+            
+            deferred.reject(err);
+        }); 
+
+    return deferred.promise;
+    
 };
-
-
-
 
 module.exports = {
     methods: {
-        validPassword: validPassword,
+        validPassword: validPasswordPromise,
     }
-}
+};

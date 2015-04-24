@@ -1,0 +1,23 @@
+
+{
+    "tags": {
+        "allowUnknownTags": true,
+        "dictionaries": ["jsdoc","closure"]
+    },
+    "source": {
+    	"include": ["mail_sender","models","passport","routes","utilities"],
+        "includePattern": ".+\\.js(doc)?$",
+        "excludePattern": "(^|\\/|\\\\)_"
+    },
+    "plugins": [],
+    "templates": {
+        "cleverLinks": false,
+        "monospaceLinks": false
+    },
+    "opts": {
+    	"template": "templates/default", 
+    	"encoding": "utf8",             
+    	"destination": "./docs/",          
+    	"recurse": true                
+	}
+}

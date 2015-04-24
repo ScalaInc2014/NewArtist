@@ -27,6 +27,7 @@ var fanSchema = new Schema({
         },
         token: String,
         mailConfirmation: { type: Boolean, default: false },
+        registerMethod: String,
         preferences:[Schema.Types.ObjectId], 
         history:[historyItem], // Json Array {contenido_id,fecha_reproduccion:"Date"}
         favouriteArtists:[Schema.Types.ObjectId],

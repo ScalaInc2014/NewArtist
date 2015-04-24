@@ -4,6 +4,14 @@ var mongoose = require('mongoose');
 var mailSender = require('../mail_sender');
 var mailTypes = mailSender.mailTypes;
 
+
+/** 
+ * Conforma el objeto de Datos dependiendo del Tipo de Usuario que esté haciendo el registro 
+ * @param {object} req - Objeto de petición HTTP  con la información ingresada por el usuairo que se está registrando
+ * @param {string} userType - Tipo de usuario que está haciendo el registro (fan || artista)
+ * @return {object} user - Objeto con la estructura de Datos y el modelo del usuario a registrar.
+*/
+
 var getUserConfiguration = function(req, userType) {
     
     var user = {};

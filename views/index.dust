@@ -13,7 +13,7 @@
  		 	
  		 	<div id='menu'>
 				<span class='name'>{info.name}</span>
-				<a href='/logout'>logout</a>
+				<a href='/authentication/logout'>logout</a>
 			</div>
 
  	    {:else}

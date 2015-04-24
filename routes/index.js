@@ -31,6 +31,13 @@ var authenticationRoutes = function(passport){
 		}
 	));
 
+	//Logout  page
+	router.get('/logout/', function(req, res) {
+		
+		req.logout();
+		res.redirect('/');
+	});
+
 
 	//Page for Fan signup
 	router.get('/signup/fan', function(req, res){

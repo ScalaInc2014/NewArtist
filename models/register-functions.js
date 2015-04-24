@@ -25,7 +25,7 @@ var hashPassword = function (next) {
             next();
         })
 
-        .then(null,function(err){
+        .catch(function(err){
             
             next(err);
         }); 
@@ -41,7 +41,7 @@ var userSavePromise = function (newUserObject){
     newUser.save(function(err){
 
         if(err) 
-            return deferred.reject(err);
+            deferred.reject(err);
   
         var userSaved = {
             
@@ -56,6 +56,12 @@ var userSavePromise = function (newUserObject){
     return deferred.promise; 
 };
 
+/** 
+ * Busca en la BD el mail ingresado en el proceso de Registro  
+ * @param {object} newUserObject - Información dada por el usuairo en el momento del registro
+ 
+*/
+
 var registerPromise = function (newUserObject){
     
    
@@ -69,14 +75,14 @@ var registerPromise = function (newUserObject){
         .then(function(user){
 
             if(user)
-                return deferred.resolve(false);
+                deferred.resolve(false);
             else{
 
                 self.userSavePromise(newUserObject)
 
                     .then(function(userSaved){
 
-                       return deferred.resolve(userSaved);
+                        deferred.resolve(userSaved);
                     });
             }
 
@@ -84,7 +90,7 @@ var registerPromise = function (newUserObject){
 
         .then(null, function(err){
 
-            return deferred.reject(err);
+            deferred.reject(err);
         }); 
         
    return deferred.promise; 

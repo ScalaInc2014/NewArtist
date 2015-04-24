@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: passport/register-middlewares.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: passport/register-middlewares.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>var Fan = require('../models/fan');
+var Artist = require('../models/artist');
+var mongoose = require('mongoose');
+var mailSender = require('../mail_sender');
+var mailTypes = mailSender.mailTypes;
+
+
+/** 
+ * Conforma el objeto de Datos dependiendo del TIpo de Usuario que esté haciendo el registro 
+ * @param {object} req - Objeto de petición HTTP  con la información ingresada por el usuairo que se está registrando
+ * @param {string} userType - Tipo de usuario que está haciendo el registro (fan || artista)
+ * @return {object} user - Objeto con la estructura de Datos y el modelo del usuario a registrar.
+*/
+
+var getUserConfiguration = function(req, userType) {
+    
+    var user = {};
+    var currentDate = new Date();
+    var Id = mongoose.Types.ObjectId();
+    
+    if(userType === 'fan') {
+        
+        user.dataStructure = {
+            fanId: Id,
+            info:{
+                name: req.body.name,
+                password: req.body.password,
+                email: req.body.email,
+                birthday: req.body.birthday,
+                gender: req.body.gender,
+                avatarPath: 'http://www.nocturnar.com/forum/attachments/fondos-de-pantalla/28575d1338158805-paisajes-hermosos-fondo-de-pantalla-paisajes_hermosos_del_mundo2.jpg',
+                location: req.body.location
+            },
+            registerDate: currentDate,
+            token: Id,
+        };
+        
+        user.model = Fan;
+      
+    }
+    else {
+        user.dataStructure = {
+            artistId: Id,
+            info:{
+             
+                name: req.body.name,
+                password: req.body.password,
+                email: req.body.email,
+                avatarPath: 'http://www.nocturnar.com/forum/attachments/fondos-de-pantalla/28575d1338158805-paisajes-hermosos-fondo-de-pantalla-paisajes_hermosos_del_mundo2.jpg',
+                location: req.body.location
+                
+            },
+            artType: req.body.artType,
+            registerDate: currentDate,
+            token: Id,
+            
+        };
+        
+        user.model = Artist;
+     
+    }
+    
+    return user;
+};
+
+var registerUser = function(userType) {
+    
+    return function(req, res){
+
+        var user = getUserConfiguration(req, userType);
+        var registerFailRedirect = '/authentication/signup/'+ userType;
+        var mailVerificationRedirect = '/authentication/signup/mail_verification';
+        var locals = {}; //variables for template
+        
+        user.model.registerPromise(user.dataStructure)
+        
+            .then(function(newUserInfo){
+ 
+                if(newUserInfo) {
+                    
+                    locals.confirmationLink = 'http://localhost:8080/authentication/signup/confirmation/'+userType+'/'+ newUserInfo.token;
+                    locals.userType = userType;
+                    mailSender(newUserInfo.email, locals, mailTypes.CONFIRMATION_MAIL)
+                     
+                        .then(function (info) {
+
+                            res.redirect(mailVerificationRedirect);
+
+                        })
+                        
+                        .then(null,function(err){
+                            
+                            console.log("ON REJECTED ");
+                            console.log(err);
+                        });
+                }
+                else {
+                    
+                    console.log("User already exists");
+                    req.flash('error', 'User Already Exists!!!');
+                    res.redirect(registerFailRedirect);
+                }                
+                
+            })
+            
+            .then(null,function(err){
+                
+                console.log("Operational Error");
+                console.log(err);
+                
+            });
+    };
+};
+
+
+var mailConfirmation = function (userType){
+    
+    var userModel;
+    
+    if(userType === 'fan')
+        userModel = Fan;
+    else if(userType === 'artist')
+        userModel = Artist;
+
+    return function(req, res){
+        
+        var userId = req.params.user_id;
+        var query = userModel.findOne({ 'token': userId});
+        var verifyTokenPromise = query.exec();
+        var mailVerificatedRedirect = '/';
+        var errorVerificationRedirect = '/authentication/signup/verificationError';
+        verifyTokenPromise
+
+            .then(function(user){
+    
+                if(user){
+                    
+                   if(!user.mailConfirmation){
+
+                        query = userModel.findByIdAndUpdate( user._id, { $set: {  mailConfirmation: true }});
+                        var updateMailConfirmationPromise = query.exec();
+                        return updateMailConfirmationPromise;
+                   } 
+                   else{
+
+                        req.flash('error', 'Link de Verificación ha Expirado');
+                        res.redirect(errorVerificationRedirect);
+                   }
+
+                }
+
+                else{
+
+                    req.flash('error', 'Link de Verificación Inválido');
+                    res.redirect(errorVerificationRedirect);
+
+                }
+
+            })
+            
+            .then (function(user){
+
+                if(user){
+                    
+                     req.login( user, function(err) {
+                        
+                        if (err) return console.log(err);
+                        res.redirect(mailVerificatedRedirect);
+                    });                    
+                    
+                }
+            })            
+    
+            .then(null, function(err){
+
+                return console.log(err);
+            }); 
+
+    };
+
+};
+
+module.exports = {
+
+ registerUser: registerUser,
+ mailConfirmation : mailConfirmation
+
+};</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#getUserConfiguration">getUserConfiguration</a></li><li><a href="global.html#registerPromise">registerPromise</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-beta3</a> on Mon Apr 20 2015 19:47:35 GMT+0000 (UTC)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

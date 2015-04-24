@@ -5,9 +5,6 @@ var Artist = require('../models/artist');
 var userLogin = function (userType) {
     
     var userModel;
-    
-    console.log("Login Strategy para " + userType);
-    
     if(userType === 'fan')
         userModel = Fan;
     else if(userType === 'artist')
@@ -27,37 +24,38 @@ var userLogin = function (userType) {
             var query = userModel.findOne({ 'info.email': email});
             var verifyUserPromise = query.exec();
             
+            
             verifyUserPromise
         
                 .then(function(user){
-        
+
                     if(user){
+
+                        user.validPassword(password)
                         
-                        console.log(user.validPassword(password));
-                        if (!user.validPassword(password)) {
+                            .then(function(loggedUser){
+
+                                if(loggedUser)
+                                    return done(null, user);
+                                else
+                                    return done(null, false, { message: 'Contraseña Incorrecta' });
+                            })  
                             
-                            return done(null, false, { message: 'Contraseña Incorrecta' });
-                        }  
-                        
-                        else{
-                            
-                            return done(null, user);
-                            
-                        }
-                        
+                            .then(null,function(err){
+                                
+                                return done(err);
+                            });
                     }
-                    else{
-        
-                        return done(null, false, { message: 'Correo Electrónico Incorrecto' });
-                    }
-        
+                       
+                    else
+                        done(null, false, { message: 'Correo Electrónico Incorrecto' });
                 })
-        
+                
+                
                 .then(null, function(err){
-        
+
                     return done(err);
                 });         
-            
         }
     );
         
