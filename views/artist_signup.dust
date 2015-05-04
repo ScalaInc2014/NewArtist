@@ -12,7 +12,7 @@
 		<H1> Registre sus datos!</H1>
 		<p> {errorMessage} </p>
 		<div> </div>
-		<form action="/authentication/signup/artist" method="post">
+		<form action="/authentication/signup/manual/artist" method="post">
 		    <div>
 		        <label>Nombre Artístico:</label>
 		        <input type="text" name="name"/>

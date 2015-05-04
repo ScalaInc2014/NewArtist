@@ -12,7 +12,7 @@
 		<H1> Registre sus datos!</H1>
 		<p> {errorMessage} </p>
 		<div> </div>
-		<form action="/authentication/signup/fan" method="post">
+		<form action="/authentication/signup/manual/fan" method="post">
 		    <div>
 		        <label>Correo electrónico:</label>
 		        <input type="text" name="email"/>

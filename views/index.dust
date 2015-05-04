@@ -13,13 +13,13 @@
  		 	
  		 	<div id='menu'>
 				<span class='name'>{info.name}</span>
-				<a href='/authentication/logout'>logout</a>
+				<a href='/authentication/signout'>logout</a>
 			</div>
 
  	    {:else}
  	     	
  	     	<div id='menu'>
- 	     		<a href='/authentication/login'>Iniciar Sesión</a> 
+ 	     		<a href='/authentication/signin'>Iniciar Sesión</a> 
  	     		<a href='/authentication/signup/fan'>Registro Fans</a>  
  	     		<a href='/authentication/signup/artist'>Registro Artistas</a> 
  	     	</div>

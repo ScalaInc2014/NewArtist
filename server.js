@@ -17,8 +17,7 @@ var engines = require("consolidate"); // Normalize Template's Render Functions
 server.use(express.static(path.join(__dirname, 'public'))); // Called before authenticationRoutes, in order to prevent the router handles /public/bootstrap
 
 //-------------- Local dependencies -----------------------------------//
-var setPassportConfigurations = require('./passport/init');
-var authenticationRoutes = require('./routes');
+var setPassportConfigurations = require('./Authentication/Passport/init');
 
 
 /* View´s Directory and Views Engine Configuration*/
@@ -62,10 +61,9 @@ server.get('/', function(req, res) {
 	res.render('index.dust', {title:'NEWARTIST'});
 });
 
-server.use('/authentication', authenticationRoutes(passport));
+var routes = require('./Routes')(server);
 
 ///** ROUTES ****///
-
 
 server.listen(8080, function(){
 	console.log("NewArtist running in port 8080");
