@@ -89,7 +89,7 @@ var registerUser = function(userType) {
  
                 if(result.user) {
                     
-                    locals.confirmationLink = 'http://localhost:8080/authentication/signup/confirmation/'+userType+'/'+ result.token;
+                    locals.confirmationLink = 'http://localhost:8080/authentication/signup/confirmation/'+userType+'/'+ result.user.token;
                     locals.userType = userType;
                     mailSender(result.user.email, locals, mailTypes.CONFIRMATION_MAIL)
                      
