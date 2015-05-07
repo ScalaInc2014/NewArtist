@@ -1,13 +1,15 @@
 var mongoose = require('mongoose');
-var mailSender = require('../../../mail_sender');
+var mailSender = require('../../../Mail_sender');
 var mailTypes = mailSender.mailTypes;
 var models = require("../../../Models");
 
-/** 
- * Conforma el objeto de Datos dependiendo del Tipo de Usuario que esté haciendo el registro 
- * @param {object} req - Objeto de petición HTTP  con la información ingresada por el usuairo que se está registrando
- * @param {string} userType - Tipo de usuario que está haciendo el registro (fan || artista)
- * @return {object} user - Objeto con la estructura de Datos y el modelo del usuario a registrar.
+/**
+  <p> Returns the User's Object in relation with the User doing the Register Process: </p>
+ * @param {string} req - Request HTTP.
+ * @param {string} userType - Fan || Artists.
+ * @memberof module:Authentication.
+ * @inner
+ * @return {object} user - User's data Structure. 
 */
 
 var getUserConfiguration = function(req, userType) {
@@ -57,6 +59,21 @@ var getUserConfiguration = function(req, userType) {
     return user;
 };
 
+/**
+  <p> Returns a function with  the necessary processes to complete User's registration: </p>
+
+    <ul>
+        <li> Populate the user object through getUserConfiguration.
+        <li> Start the registration process through user.model.registerPromise.
+        <li> If register process is complete, sends an Email through mailSender Method.
+        <li> Redirects to the properly route.
+    </ul>
+ * @param {string} userType - Fan || Artists.
+ * @memberof module:Authentication
+ * @inner
+ * @return {function} 
+*/
+
 var registerUser = function(userType) {
     
     return function(req, res){
@@ -68,13 +85,13 @@ var registerUser = function(userType) {
         
         user.model.registerPromise(user.dataStructure)
         
-            .then(function(newUserInfo){
+            .then(function(result){
  
-                if(newUserInfo) {
+                if(result.user) {
                     
-                    locals.confirmationLink = 'http://localhost:8080/authentication/signup/confirmation/'+userType+'/'+ newUserInfo.token;
+                    locals.confirmationLink = 'http://localhost:8080/authentication/signup/confirmation/'+userType+'/'+ result.token;
                     locals.userType = userType;
-                    mailSender(newUserInfo.email, locals, mailTypes.CONFIRMATION_MAIL)
+                    mailSender(result.user.email, locals, mailTypes.CONFIRMATION_MAIL)
                      
                         .then(function (info) {
 
@@ -83,15 +100,13 @@ var registerUser = function(userType) {
                         })
                         
                         .then(null,function(err){
-                            
-                            console.log("ON REJECTED ");
+
                             console.log(err);
                         });
                 }
                 else {
-                    
-                    console.log("User already exists");
-                    req.flash('error', 'User Already Exists!!!');
+
+                    req.flash('error', result.informationMessage);
                     res.redirect(registerFailRedirect);
                 }                
                 

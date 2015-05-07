@@ -7,7 +7,7 @@ var signinRoutes = function(){
 	//Login page
 	router.get('/', function(req, res) {
     	// Display the Login page with any flash message, if any
-		res.render('signin',{ errorMessage : req.flash('error') });
+		res.render('./Signin/signin',{ errorMessage : req.flash('error') });
 	});
 	
 	// POST Fan Login

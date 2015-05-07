@@ -1,6 +1,20 @@
 var LocalStrategy   = require('passport-local').Strategy;
 var models = require('../../Models');
  
+/**
+  <p> Returns a function with  the UserStrategy in relation with the User's Type: </p>
+
+    <ul>
+        <li> Populates userModel in relation with the UserType.
+        <li> Declare a Strategy that starts the processes to signin through userModel.signinPromise .
+        <li> The Signin Promise returns the Authentication's result and passes it to Passport's Done() Method.
+    </ul>
+ * @param {string} userType - Fan || Artists.
+ * @memberof module:Authentication
+ * @inner
+ * @return {function} Passport Strategy
+*/
+
 var getUserStrategy = function (userType) {
     
     var userModel = models[userType];    
@@ -14,42 +28,21 @@ var getUserStrategy = function (userType) {
     
         function(email, password, done) {
     
-            
-            var query = userModel.findOne({ 'info.email': email});
-            var verifyUserPromise = query.exec();
-            
-            
-            verifyUserPromise
-        
-                .then(function(user){
+            userModel.signinPromise(email, password)
+                
+                .then(function(result){
 
-                    if(user){
-
-                        user.validPassword(password)
-                        
-                            .then(function(loggedUser){
-
-                                if(loggedUser)
-                                    return done(null, user);
-                                else
-                                    return done(null, false, { message: 'Contraseña Incorrecta' });
-                            })  
-                            
-                            .then(null,function(err){
-                                
-                                return done(err);
-                            });
+                    if(result.user)
+                        return done(null,result.user);
+                    else{
+                        return done(null, false, { message: result.informationMessage });
                     }
-                       
-                    else
-                        done(null, false, { message: 'Correo Electrónico Incorrecto' });
                 })
                 
-                
-                .then(null, function(err){
-
+                .then(null,function(err){
+                    
                     return done(err);
-                });         
+                });
         }
     );
         

@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: Signup/Manual/registration.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: Signup/Manual/registration.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>var mongoose = require('mongoose');
+var mailSender = require('../../../Mail_sender');
+var mailTypes = mailSender.mailTypes;
+var models = require("../../../Models");
+
+/**
+  &lt;p> Returns the User's Object in relation with the User doing the Register Process: &lt;/p>
+ * @param {string} req - Request HTTP.
+ * @param {string} userType - Fan || Artists.
+ * @memberof module:Authentication.
+ * @inner
+ * @return {object} user - User's data Structure. 
+*/
+
+var getUserConfiguration = function(req, userType) {
+    
+    var user = {};
+    var currentDate = new Date();
+    var Id = mongoose.Types.ObjectId();
+    
+    user.model = models[userType];
+    
+    if(userType === 'fan') {
+        
+        user.dataStructure = {
+            fanId: Id,
+            info:{
+                name: req.body.name,
+                password: req.body.password,
+                email: req.body.email,
+                birthday: req.body.birthday,
+                gender: req.body.gender,
+                avatarPath: 'http://www.nocturnar.com/forum/attachments/fondos-de-pantalla/28575d1338158805-paisajes-hermosos-fondo-de-pantalla-paisajes_hermosos_del_mundo2.jpg',
+                location: req.body.location
+            },
+            registerDate: currentDate,
+            token: Id,
+        };
+    }
+    else {
+        user.dataStructure = {
+            artistId: Id,
+            info:{
+             
+                name: req.body.name,
+                password: req.body.password,
+                email: req.body.email,
+                avatarPath: 'http://www.nocturnar.com/forum/attachments/fondos-de-pantalla/28575d1338158805-paisajes-hermosos-fondo-de-pantalla-paisajes_hermosos_del_mundo2.jpg',
+                location: req.body.location
+                
+            },
+            artType: req.body.artType,
+            registerDate: currentDate,
+            token: Id,
+            
+        };
+    }
+    
+    return user;
+};
+
+/**
+  &lt;p> Returns a function with  the necessary processes to complete User's registration: &lt;/p>
+
+    &lt;ul>
+        &lt;li> Populate the user object through getUserConfiguration.
+        &lt;li> Start the registration process through user.model.registerPromise.
+        &lt;li> If register process is complete, sends an Email through mailSender Method.
+        &lt;li> Redirects to the properly route.
+    &lt;/ul>
+ * @param {string} userType - Fan || Artists.
+ * @memberof module:Authentication
+ * @inner
+ * @return {function} 
+*/
+
+var registerUser = function(userType) {
+    
+    return function(req, res){
+
+        var user = getUserConfiguration(req, userType);
+        var registerFailRedirect = '/authentication/signup/'+ userType;
+        var mailVerificationRedirect = '/authentication/signup/mail_verification';
+        var locals = {}; //variables for template
+        
+        user.model.registerPromise(user.dataStructure)
+        
+            .then(function(result){
+ 
+                if(result.user) {
+                    
+                    locals.confirmationLink = 'http://localhost:8080/authentication/signup/confirmation/'+userType+'/'+ result.token;
+                    locals.userType = userType;
+                    mailSender(result.user.email, locals, mailTypes.CONFIRMATION_MAIL)
+                     
+                        .then(function (info) {
+
+                            res.redirect(mailVerificationRedirect);
+
+                        })
+                        
+                        .then(null,function(err){
+
+                            console.log(err);
+                        });
+                }
+                else {
+
+                    req.flash('error', result.informationMessage);
+                    res.redirect(registerFailRedirect);
+                }                
+                
+            })
+            
+            .then(null,function(err){
+                
+                console.log("Operational Error");
+                console.log(err);
+                
+            });
+    };
+};
+
+module.exports = registerUser;</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-Authentication.html">Authentication</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-beta3</a> on Tue May 05 2015 16:31:43 GMT+0000 (UTC)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

@@ -5,7 +5,7 @@
         "dictionaries": ["jsdoc","closure"]
     },
     "source": {
-    	"include": ["mail_sender","models","passport","routes","utilities"],
+    	"include": ["Authentication","Models","Mail_sender","Routes","Utilities"],
         "includePattern": ".+\\.js(doc)?$",
         "excludePattern": "(^|\\/|\\\\)_"
     },
@@ -17,7 +17,7 @@
     "opts": {
     	"template": "templates/default", 
     	"encoding": "utf8",             
-    	"destination": "./docs/",          
+    	"destination": "./Docs/",          
     	"recurse": true                
 	}
 }

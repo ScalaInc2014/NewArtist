@@ -10,21 +10,22 @@ var path = require("path");
 var server = express();
 var engines = require("consolidate"); // Normalize Template's Render Functions  
 
+//-------------- Local dependencies -----------------------------------//
+var setRoutes = require('./Routes');
+var setPassportConfigurations = require('./Authentication/Passport/init');
+
+
 
 
 //---------------- Serve Static Files -----------------///////////////
 
-server.use(express.static(path.join(__dirname, 'public'))); // Called before authenticationRoutes, in order to prevent the router handles /public/bootstrap
-
-//-------------- Local dependencies -----------------------------------//
-var setPassportConfigurations = require('./Authentication/Passport/init');
-
+server.use(express.static(path.join(__dirname, 'Public'))); // Called before authenticationRoutes, in order to prevent the router handles /public/bootstrap
 
 /* View´s Directory and Views Engine Configuration*/
 var viewEngineName = 'dust';
 server.engine(viewEngineName , engines.dust);
 server.set('view engine', viewEngineName);
-server.set('views', __dirname + '/views');
+server.set('views', __dirname + '/Views/');
 
 
 // The middleware is used to parse the url encoded
@@ -61,7 +62,7 @@ server.get('/', function(req, res) {
 	res.render('index.dust', {title:'NEWARTIST'});
 });
 
-var routes = require('./Routes')(server);
+setRoutes(server);
 
 ///** ROUTES ****///
 
