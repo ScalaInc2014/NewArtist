@@ -50,11 +50,9 @@ var mailSender = function(to, locals, mailType) {
            
             mailService.sendMail(mailOptions, function(err, info){
                 
-                //if(err) return deferred.reject(err);
-    
                 if(err) 
-                    return deferred.resolve(err);
-                
+                    return deferred.reject(err);
+    
                 return deferred.resolve(info);
                 
             }); 

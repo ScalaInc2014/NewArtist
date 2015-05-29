@@ -1,23 +1,91 @@
+
+#manualRegister{
+
+	display:  inline-block;
+	margin: 10% 5% 10% 20%;
+}
+
+.facebook{
+
+	margin-top: 10%;
+	display: inline-block;
+	position: absolute;
+}
+
+.facebook img{
+
+	width: 100%;
+}
+
+.facebook p{
+
+	text-align: center;
+
+}
+
+.google{
+
+	margin: 10% 5% 5% 20%;
+	display: inline-block;
+	position: absolute;
+}
+
+.google img{
+
+	width: 100%;
+}
+
+.google p{
+
+	text-align: center;
+
+}
+
+
+#facebookSignin{
+
+	margin: 0 0 0 8%;
+	position: relative;
+}
+
+#googleSignin{
+
+	margin: 0 0 0 8%;
+	position: relative;
+}
+
+#artistSignin{
+
+	background-color: #81BEF7; 
+	position: absolute;
+}
+
+#fanSignin{
+
+	background-color: #A9F5A9;
+}
+
+
 #menu {
-position: absolute;
-top: 15px;
-right: 20px;
-font-size: 12px;
-color: #888;
+	position: absolute;
+	top: 15px;
+	right: 20px;
+	font-size: 12px;
+	color: #888;
 }
 #menu .name:after {
-content: ' -';
+	content: ' -';
 }
 #menu a {
-  
-margin-left: 5px;
 
+	margin-left: 5px;
 }
 
-.loginSection {
-    
-    display: inline-block;
-    margin-left: 20%;
-    
-    
+.users{
+
+	border-radius: 10px;
+	display: inline-block;
+	margin: 5% 2% 10% 15%;
+	padding: 2%;
+	text-align: center;
 }

@@ -1,9 +1,13 @@
-var signinRoutes = require('./signin');
-var signupRoutes = require('./signup');
-var signoutRoutes = require('./signout');
+var getManualSigninRoutes = require('./signin');
+var getManualSignupRoutes = require('./signup');
+var getSignoutRoutes = require('./signout');
+var getFacebookRoutes = require('./facebook');
+var getGoogleRoutes = require('./google');
 
 module.exports = {
-	signin: signinRoutes,
-	signup: signupRoutes,
-	signout: signoutRoutes
+	getManualSigninRoutes: getManualSigninRoutes,
+	getManualSignupRoutes: getManualSignupRoutes,
+	getSignoutRoutes: getSignoutRoutes,
+	getFacebookRoutes: getFacebookRoutes,
+	getGoogleRoutes: getGoogleRoutes
 };

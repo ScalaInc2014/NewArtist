@@ -1,5 +1,11 @@
 var users = require('./Users');
 
+module.exports = {
+    fan: users.fan,
+    artist: users.artist
+};
+
+
 /** 
  *  <h3>Description: Contains the Schemas's declarations and all the components associated to them.</h3>
     <ul> 
@@ -16,10 +22,3 @@ var users = require('./Users');
     </ul> 
  * @module Models
 */
-
-
-
-module.exports = {
-    fan: users.fan,
-    artist: users.artist
-};

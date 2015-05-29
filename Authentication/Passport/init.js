@@ -1,4 +1,6 @@
-var signin = require("../Signin");
+var manual = require("../Manual/");
+var facebook = require("../Facebook/strategy");
+var google = require("../Google/strategy");
 
 var setPassportConfigurations = function(passport){
 
@@ -14,8 +16,10 @@ var setPassportConfigurations = function(passport){
         done(null, user);
     });
     
-    passport.use('fanLogin', signin.manual.getUserStrategy('fan'));
-    passport.use('artistLogin', signin.manual.getUserStrategy('artist'));
+    passport.use('fanLogin', manual.signin.getUserStrategy('fan'));
+    passport.use('artistLogin', manual.signin.getUserStrategy('artist'));
+    passport.use('facebook',facebook('fan'));
+    passport.use('google',google('fan'));
 };
 
 module.exports = setPassportConfigurations;

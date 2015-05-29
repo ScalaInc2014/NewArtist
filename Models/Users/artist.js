@@ -38,6 +38,7 @@ var ArtistSchema = new Schema({
         token: String,
         mailConfirmation: { type: Boolean, default: false },
         registerMethod: String,
+        registerMode: String,
         premium: Boolean,
         artType: String,
         content:[Schema.Types.ObjectId], 

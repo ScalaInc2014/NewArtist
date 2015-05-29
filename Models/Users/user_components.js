@@ -1,5 +1,6 @@
 var bcrypt = require("bcrypt");
 var Q = require('q');
+var messages = require('../../Messages');
 
 //***************************** Public *******************************//
 
@@ -13,26 +14,24 @@ var Q = require('q');
 
 var userSavePromise = function (newUserObject){
 
-
     var deferred = Q.defer();
-    
     var newUser = new this(newUserObject);
 
     newUser.save(function(err){
 
         if(err) 
-            return deferred.reject(err);
-  
-        var userSaved = {
-            
-            token: newUser.token,
-            email: newUser.info.email
-            
-        };
-        console.log("USER SUCCESSFULLY SAVED IN  COLLECTION ");
-        deferred.resolve(userSaved);
-    });   
-
+            deferred.reject(err);
+        else{
+            var userSaved = {
+                
+                token: newUser.token,
+                email: newUser.info.email
+                
+            };
+            deferred.resolve(userSaved);
+        }
+    });  
+    
     return deferred.promise; 
 };
 
@@ -74,6 +73,29 @@ var hashPassword = function (next) {
         }); 
 };
 
+/**
+    <p> Populates a result object and resolve a promise </p>
+    <ul>
+        <li> Populates result.user.
+        <li> Populates result.message.
+        <li> Resolve the promise.
+    </ul>
+ * @param {object} deferred - Q's Promise Object.
+ * @param {object} user - User info.
+ * @param {string} message - Notification to Client.
+ * @memberof module:Models.
+ * @inner
+
+*/
+
+var resolvePromise = function (deferred, user, message){
+
+    var result = {};
+    result.user = user;
+    result.informationMessage = message;
+    deferred.resolve(result);
+};
+
 
 /**
     <p> Starts the processes to Register an User in the app. </p>
@@ -91,51 +113,41 @@ var hashPassword = function (next) {
 
 var registerPromise = function (newUserObject){
     
-   
     var deferred = Q.defer();
     var self = this;   
     var query = self.findOne({ 'info.email': newUserObject.info.email});
     var verifyUserPromise = query.exec();
-    var result = {};
+
     verifyUserPromise
 
         .then(function(user){
 
-            if(user){
-               result.user = null;
-               result.informationMessage = 'Correo Electrónico Duplicado';
-               deferred.resolve(result);
-            }
-                
+            if(user)
+                resolvePromise(deferred, null, messages.notification.ALREADY_REGISTERED); 
             else{
 
                 self.userSavePromise(newUserObject)
 
                     .then(function(userSaved){
-
-                        result.user = userSaved;
-                        result.informationMessage = null;
-                        deferred.resolve(result);
+                         resolvePromise(deferred, userSaved, null);
                     });
             }
             
         })
 
         .then(null, function(err){
-
             deferred.reject(err);
         }); 
         
    return deferred.promise; 
 };
 
-
 /**
-    <p> Starts the processes to Signin an User in the app. </p>
+    <p> Starts the processes to Signing  manually in the app. </p>
     <ul>
         <li> Verifies that user's email is in the DB.
         <li> Starts the password's verification.
-        <li> Populates a Result Object with the user's information and a Notification message.
+        <li> Starts de ResolvePromise process.
     </ul>
  * @param {string} email - Mail supplied by the User.
  * @param {string} password - Password supplied by the User.
@@ -145,59 +157,89 @@ var registerPromise = function (newUserObject){
 
 */
 
-var signinPromise = function (email, password){
+var manualSignin = function (email, password) {
     
     var deferred = Q.defer();
     var self = this;   
     var query = self.findOne({ 'info.email': email});
     var verifyUserPromise = query.exec();
-    var result = {};
-            
+
     verifyUserPromise
         
         .then(function(user){
 
             if(user){
 
-                user.validPassword(password)
-                        
-                    .then(function(loggedUser){
-
-                        if(loggedUser){
-                            result.user = user;
-                            result.informationMessage = null;
-                            deferred.resolve(result);
-                        }
-                        else{
-                            result.user = null;
-                            result.informationMessage = 'Contraseña Incorrecta';
-                            deferred.resolve(result);
-                        }
-                    })  
+                if(user.registerMode === "manual"){
+                    
+                    user.validPassword(password)
                             
-                    .then(null,function(err){
+                        .then(function(loggedUser){
+    
+                            if(loggedUser)
+                                resolvePromise(deferred, user, null);
+                            else
+                                resolvePromise(deferred, null, messages.notification.INVALID_PASSWORD);
+                        })  
                                 
-                        return deferred.reject(err);
-                    });
-            }
-                       
-            else{
-                result.user = null;
-                result.informationMessage = 'Correo Electrónico Incorrecto';
-                deferred.resolve(result);
-            }
-            
-           
+                        .then(null,function(err){            
+                            deferred.reject(err);
+                        });                      
+                }  
+                else{
+                    var message =  messages.notification.INVALID_AUTHENTICATION_TYPE + user.registerMode;
+                    resolvePromise(deferred, null, message);
+                }
+            }              
+            else
+                resolvePromise(deferred, null, messages.notification.INVALID_EMAIL);
         })
-                
-                
+
         .then(null, function(err){
 
-            return deferred.reject(err);
+            deferred.reject(err);
         });  
     
     return deferred.promise;
     
+};
+
+/**
+    <p> Starts the processes to Signin through a social Network. </p>
+    <ul>
+        <li> Verifies user's email is in the DB and the Signin's and Signup's Method matches.
+        <li> Starts de ResolvePromise process.
+    </ul>
+ * @param {string} email - Mail supplied by the User.
+ * @param {string} provider - Signin Method.
+ * @memberof module:Models.
+ * @inner
+ * @return {Promise}
+
+*/
+
+var socialSignin = function (email, provider) {
+    
+    var deferred = Q.defer();
+    var self = this;   
+    var query = self.findOne({ 'info.email': email});
+    var verifyUserPromise = query.exec();
+
+    verifyUserPromise
+        
+        .then(function(user){
+
+            if(user && (provider == user.registerMode))
+                resolvePromise(deferred, user, null);
+            else
+                resolvePromise(deferred, null, messages.notification.INVALID_EMAIL);              
+        })
+
+        .then(null, function(err){
+            deferred.reject(err);
+        });  
+    
+    return deferred.promise;  
 };
 
 /**
@@ -214,7 +256,6 @@ var signinPromise = function (email, password){
 
 */
 
-
 var validPasswordPromise = function (password) {
 
     var deferred = Q.defer();
@@ -226,9 +267,9 @@ var validPasswordPromise = function (password) {
         .then(function(hash){
 
             if(hash === document.info.password)
-                 deferred.resolve(true);
-
-            deferred.resolve(false);
+                deferred.resolve(true);
+            else
+                deferred.resolve(false);
         })
         
         .catch(function(err){
@@ -247,7 +288,8 @@ module.exports = {
     },
     statics: {
         registerPromise: registerPromise,
-        signinPromise: signinPromise,
+        manualSignin: manualSignin,
+        socialSignin: socialSignin,
         userSavePromise: userSavePromise
     },
     saveMiddlewares: {

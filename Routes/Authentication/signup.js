@@ -2,7 +2,11 @@ var express = require('express');
 var router = express.Router();
 var authentication = require('../../Authentication');
 
+
 var signupRoutes = function(){
+	
+	/////***** GET REQUEST ****** ////////////
+	
 	
 	//Page for Fan signup
 	router.get('/fan', function(req, res){
@@ -14,17 +18,6 @@ var signupRoutes = function(){
 		res.render('./Signup/artist',{ errorMessage : req.flash('error') });
 	});
 
-	//POST Fan signup data
-	router.post('/manual/fan', authentication.registerUser('fan', 'manual'));
-	
-	//POST Artist signup data
-	router.post('/manual/artist', authentication.registerUser('artist', 'manual'));	
-	
-	/* Get Mail Verification */
-	router.get('/mail_verification', function(req, res){
-		res.render('./Signup/mail_verification',{ errorMessage : req.flash('error') });
-	});
-
 	/* Get Mail Confirmation from Fans */
 	router.get('/confirmation/fan/:user_id', authentication.verifyEmail('fan'));
 
@@ -32,9 +25,22 @@ var signupRoutes = function(){
 	router.get('/confirmation/artist/:user_id', authentication.verifyEmail('artist'));
 
 	/* Get Error Authentication */
-	router.get('/verificationError', function(req, res){
+	router.get('/confirmation/error', function(req, res){
 		res.render('./Signup/verification_error',{ errorMessage : req.flash('error') });
 	});
+
+	/* Get Mail Verification */
+	router.get('/confirmation/sent', function(req, res){
+		res.render('./Signup/mail_verification',{ errorMessage : req.flash('error') });
+	});
+	
+	/////***** POST REQUEST ****** ////////////
+	
+	//POST Fan signup data
+	router.post('/fan', authentication.signupUserManually('fan'));
+	
+	//POST Artist signup data
+	router.post('/artist', authentication.signupUserManually('artist'));
 
 	return router;
 };

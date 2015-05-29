@@ -5,7 +5,7 @@ var authentication = require('../../Authentication');
 
 var signoutRoutes = function(){
 
-	signoutRouter.get('/', authentication.logout);
+	signoutRouter.get('/', authentication.signout);
 	return signoutRouter;
 };
 

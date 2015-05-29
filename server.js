@@ -15,8 +15,6 @@ var setRoutes = require('./Routes');
 var setPassportConfigurations = require('./Authentication/Passport/init');
 
 
-
-
 //---------------- Serve Static Files -----------------///////////////
 
 server.use(express.static(path.join(__dirname, 'Public'))); // Called before authenticationRoutes, in order to prevent the router handles /public/bootstrap
@@ -36,13 +34,13 @@ server.use(bodyParser.urlencoded({ extended : true }));
 
 var sessionOpts = {
  	
- 		secret: 'keyboard cat',
-	 	store: new MongoStore({ db: 'NewArtist'}),
-	 	key: 'NewArtist_sid',
-	    cookie: { 
-	    	// expires: new Date(Date.now() + 60000),
-	        // maxAge: new Date(Date.now() + 60000) 
-	    }
+ 	secret: 'keyboard cat',
+ 	store: new MongoStore({ db: 'NewArtist'}),
+ 	key: 'NewArtist_sid',
+    cookie: { 
+    	// expires: new Date(Date.now() + 60000),
+        // maxAge: new Date(Date.now() + 60000) 
+    }
 };
 
 server.use(session(sessionOpts)); 

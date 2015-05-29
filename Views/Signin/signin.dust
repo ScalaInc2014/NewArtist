@@ -10,50 +10,48 @@
 
 	<body>
 
-		<H1> Inicio de Sesión!</H1>
 		<p> {errorMessage} </p>
-		<div> </div>
-		<form action="/authentication/signin/manual/fan/" method="post" class='loginSection'>
-		   
-		   <div class='loginSection'> 
-		   
-		        <h2> FANS </h2>
-    		    <div>
-    		        <label>Correo electrónico:</label>
-    		        <input type="text" name="email"/>
-    		    </div>
-    		    <div>
-    		        <label>Contraseña:</label>
-    		        <input type="password" name="password"/>
-    		    </div>
-    		   
-    		    <div>
-    		        <input type="submit" value="Iniciar Sesión"/>
-    		    </div>
-    		    
-    	   </div>
-  
-		</form>
-		<form action="/authentication/signin/manual/artist/" method="post" class='loginSection'>
-		   
-		   <div> 
-		   
-		        <h2> ARTISTAS </h2>
-    		    <div>
-    		        <label>Correo electrónico:</label>
-    		        <input type="text" name="email"/>
-    		    </div>
-    		    <div>
-    		        <label>Contraseña:</label>
-    		        <input type="password" name="password"/>
-    		    </div>
-    		   
-    		    <div>
-    		        <input type="submit" value="Iniciar Sesión"/>
-    		    </div>
-    		    
-    	   </div>
-		</form>		
+		<div id="fanSignin" class="users"> 
+            <h2> FANS </h2>
+            <div>
+                <form action="/authentication/signin/fan/" method="post" class='loginSection'>
+
+
+                            <label>Correo electrónico:</label>
+                            <input type="text" name="email"/>
+
+                            <label>Contraseña:</label>
+                            <input type="password" name="password"/>
+                            <br>
+                            <input type="submit" value="Iniciar Sesión"/>
+
+                </form>
+            </div>
+            <div class="facebook" id="facebookSignin">         
+                <a href='/authentication/facebook'>     
+                    <h2> Facebook </h2>
+                    <img src="/img/facebook2.svg">  
+                </a>
+            </div>
+            <div class="google" id="googleSignin">         
+                <a href='/authentication/google'>     
+                    <h2> Google </h2>
+                    <img src="/img/google.svg">  
+                </a>
+            </div>            
+        </div>
+        <div id="artistSignin" class="users">
+             <h2> ARTISTAS </h2>
+    		<form action="/authentication/signin/artist/" method="post" class='loginSection'>
+
+        		        <label>Correo electrónico:</label>
+        		        <input type="text" name="email"/>
+        		        <label>Contraseña:</label>
+        		        <input type="password" name="password"/>
+                        <br>
+        		        <input type="submit" value="Iniciar Sesión"/>
+    		</form>	
+        </div>	
 	</body>
 </html>
 
