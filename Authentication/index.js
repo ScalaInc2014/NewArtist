@@ -75,7 +75,7 @@ var accessThroughSocialNetwork = function(provider, process){
             }
         ); 
 
-
+};
 
 /**
   <p> Methods that terminate a login session. Removes the req.user property. </p>

@@ -57,6 +57,7 @@ var hashPassword = function (next) {
 
             document.info.salt = salt;
             var bcryptHash = Q.denodeify(bcrypt.hash);
+            console.log("Password " + document.info.password);
             return bcryptHash(document.info.password, salt);
 
         })
