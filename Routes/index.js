@@ -1,5 +1,21 @@
 var authentication = require('./Authentication');
 
+
+var setRoutes = function(server){
+
+	server.use('/authentication/signin', authentication.getManualSigninRoutes());
+	server.use('/authentication/signup', authentication.getManualSignupRoutes());
+	server.use('/authentication/signout', authentication.getSignoutRoutes());
+    server.use('/authentication/facebook', authentication.getFacebookRoutes());	
+    server.use('/authentication/google', authentication.getGoogleRoutes());
+    server.use('/authentication/password_recovery', authentication.getPasswordRecoveryRoutes());
+
+};
+
+module.exports = setRoutes;
+
+
+
 /** 
  *  <h3>Description: Contains all the Routes required by the Clients.</h3>
     <ul> 
@@ -19,17 +35,3 @@ var authentication = require('./Authentication');
     </ul> 
  * @module Routes
 */
-
-
-var setRoutes = function(server){
-
-	server.use('/authentication/signin', authentication.getManualSigninRoutes());
-	server.use('/authentication/signup', authentication.getManualSignupRoutes());
-	server.use('/authentication/signout', authentication.getSignoutRoutes());
-    server.use('/authentication/facebook', authentication.getFacebookRoutes());	
-    server.use('/authentication/google', authentication.getGoogleRoutes());
-};
-
-module.exports = setRoutes;
-
-

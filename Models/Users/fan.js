@@ -11,7 +11,6 @@ var historyItem = new Schema({
 
 var fanSchema = new Schema({
 
-        fanId: Schema.Types.ObjectId,
         info:{
          
             name: String,
@@ -24,8 +23,8 @@ var fanSchema = new Schema({
             location: String
             
         },
-        token: String,
-        mailConfirmation: { type: Boolean, default: false },
+        mailConfirmation: { type : Boolean, default : false },
+        passwordRequest: Date,
         registerMethod: String,
         registerMode: String,
         preferences:[Schema.Types.ObjectId], 

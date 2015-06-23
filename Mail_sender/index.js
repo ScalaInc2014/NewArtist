@@ -2,7 +2,7 @@ var Q = require("q");
 var mailService = require('../Utilities/Mail_service');
 var mailTypes = require('./mail_types');
 var dust = require('dustjs-linkedin');
-var deferred = Q.defer();
+
 
 /** 
  *  <h3>Description: Contains the Promise that allows to Send an email and an object with the email's subject and template .</h3>
@@ -33,7 +33,7 @@ var deferred = Q.defer();
 
 var mailSender = function(to, locals, mailType) {
     
-    
+    var deferred = Q.defer();
     var dustRenderPromise = Q.denodeify(dust.render);
    
     dustRenderPromise( mailType.view, locals)
@@ -51,9 +51,9 @@ var mailSender = function(to, locals, mailType) {
             mailService.sendMail(mailOptions, function(err, info){
                 
                 if(err) 
-                    return deferred.reject(err);
+                    deferred.reject(err);
     
-                return deferred.resolve(info);
+                deferred.resolve(info);
                 
             }); 
 
@@ -61,7 +61,7 @@ var mailSender = function(to, locals, mailType) {
         
         .then(null, function(err){
             
-            return deferred.reject(err);
+            deferred.reject(err);
             
         });        
     

@@ -7,4 +7,10 @@ mailTypes.CONFIRMATION_MAIL = {
     
 };
 
+mailTypes.RECOVER_PASSWORD = {
+
+	subject: 'Restablecimiento de contraseña',
+	view: 'Mail_templates/password_reset'
+};
+
 module.exports = mailTypes;

@@ -8,11 +8,13 @@ var flash = require("connect-flash");  // Middleware used for storing messages i
 var passport = require("passport");
 var path = require("path");
 var server = express();
-var engines = require("consolidate"); // Normalize Template's Render Functions  
+var engines = require("consolidate"); // Normalize Template's Render Functions
+var Q = require('q');
 
 //-------------- Local dependencies -----------------------------------//
 var setRoutes = require('./Routes');
 var setPassportConfigurations = require('./Authentication/Passport/init');
+var notification = require("./notification");
 
 
 //---------------- Serve Static Files -----------------///////////////
@@ -28,7 +30,7 @@ server.set('views', __dirname + '/Views/');
 
 // The middleware is used to parse the url encoded
 server.use(cookieParser()); // Signed Cookies in order to work with Express.session
-server.use(bodyParser.urlencoded({ extended : true }));   
+server.use(bodyParser.urlencoded({ extended : true }));
 
 // Session Options
 
@@ -45,8 +47,26 @@ var sessionOpts = {
 
 server.use(session(sessionOpts)); 
 server.use(flash());
+server.use(notification());
 server.use(passport.initialize()); 
 server.use(passport.session()); //persistent login session
+server.use(function(req, res, next){
+    
+    var ulogin = function(user){
+        
+        var deferred = Q.defer();
+        req.login(user, function(err){
+            if(err)
+                deferred.reject(err);
+            else
+                deferred.resolve();
+        });
+        return deferred.promise;
+    };
+    
+    req.ulogin = ulogin;
+    next();
+});
 
 // Strategies and configurations are set up
 setPassportConfigurations(passport);

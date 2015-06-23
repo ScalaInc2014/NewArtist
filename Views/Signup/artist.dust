@@ -3,44 +3,50 @@
 	<head>
 		<title> {title}</title>
 		<link rel='stylesheet' href='/bootstrap/css/bootstrap.min.css'/>
+		<link rel='stylesheet' href='/stylesheets/style.css'/>
 		<script  src='http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js'> </script>
 		<script  src='/bootstrap/js/bootstrap.min.js'></script>
 	</head>
 
 	<body>
 
-		<H1> Registre sus datos!</H1>
 		<p> {errorMessage} </p>
-		<div> </div>
-		<form action="/authentication/signup/artist" method="post">
-		    <div>
-		        <label>Nombre Artístico:</label>
-		        <input type="text" name="name"/>
-		    </div>		   
-		    <div>
-		        <label>Correo electrónico:</label>
-		        <input type="text" name="email"/>
-		    </div>
-		    <div>
-		        <label>Contraseña:</label>
-		        <input type="password" name="password"/>
-		    </div>
-		    <div>
-                <select name="artType">
-                  <option selected disabled> Tipo de Arte que interpretas: </option>                  
-                  <option value="musica">Música</option>
-                  <option value="teatro">Teatro</option>
-                  <option value="fotografia">Fotografía</option>
-                </select>		        
-		    </div>
-		    <div>
-		        <label>Ubicación:</label>
-		        <input type="text" name="location"/>
-		    </div>		   
-		    <div>
-		        <input type="submit" value="Registrarse"/>
-		    </div>
-		</form>
+		<header> 
+        	<h1> New Artists </h1> 
+        	<img src="/img/ticket3.svg">
+        </header>
+		<br>
+		<div id="artistSignup">
+			<form action="/authentication/signup/artist" method="post">
+			    <div>
+			        <label>Nombre Artístico:</label>
+			        <input type="text" name="name"/>
+			    </div>		   
+			    <div>
+			        <label>Correo electrónico:</label>
+			        <input type="text" name="email"/>
+			    </div>
+			    <div>
+			        <label>Contraseña:</label>
+			        <input type="password" name="password"/>
+			    </div>
+			    <div>
+	                <select name="artType">
+	                  <option selected disabled> Tipo de Arte que interpretas: </option>                  
+	                  <option value="musica">Música</option>
+	                  <option value="teatro">Teatro</option>
+	                  <option value="fotografia">Fotografía</option>
+	                </select>		        
+			    </div>
+			    <div>
+			        <label>Ubicación:</label>
+			        <input type="text" name="location"/>
+			    </div>		   
+			    <div>
+			        <input type="submit" value="Registrarse"/>
+			    </div>
+			</form>
+		</div>
 	</body>
 </html>
 

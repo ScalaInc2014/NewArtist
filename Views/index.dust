@@ -23,6 +23,7 @@
  	     		<a href='/authentication/signup/fan'>Registro Fans</a>  
  	     		<a href='/authentication/signup/artist'>Registro Artistas</a> 
  	     	</div>
+ 	     	
  	    {/session}
  	     
   	</body>

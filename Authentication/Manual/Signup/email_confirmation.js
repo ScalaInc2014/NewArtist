@@ -23,10 +23,11 @@ var verifyEmail = function (userType){
     return function(req, res){
         
         var userId = req.params.user_id;
-        var query = userModel.findOne({ 'token': userId});
-        var verifyTokenPromise = query.exec();
         var mailVerificatedRedirect = '/';
         var errorVerificationRedirect = '/authentication/signup/confirmation/error';
+        var query = userModel.findOne({ '_id': userId});
+        var verifyTokenPromise = query.exec();
+
         verifyTokenPromise
 
             .then(function(user){
@@ -34,24 +35,18 @@ var verifyEmail = function (userType){
                 if(user){
                     
                    if(!user.mailConfirmation){
-
-                        query = userModel.findByIdAndUpdate( user._id, { $set: {  mailConfirmation: true }});
-                        var updateMailConfirmationPromise = query.exec();
+                        var updateMailConfirmationPromise = userModel.findByIdAndUpdate( user._id, { $set: {  mailConfirmation: true }}).exec();
                         return updateMailConfirmationPromise;
                    } 
                    else{
-
                         req.flash('error', 'Link de Verificación ha Expirado');
                         res.redirect(errorVerificationRedirect);
                    }
 
                 }
-
                 else{
-
                     req.flash('error', 'Link de Verificación Inválido');
                     res.redirect(errorVerificationRedirect);
-
                 }
 
             })
@@ -60,11 +55,10 @@ var verifyEmail = function (userType){
 
                 if(user){
                     
-                     req.login( user, function(err) {
-                        
-                        if (err) return console.log(err);
+                    return req.ulogin(user)
+                    .then(function(){
                         res.redirect(mailVerificatedRedirect);
-                    });                    
+                    });
                     
                 }
             })            

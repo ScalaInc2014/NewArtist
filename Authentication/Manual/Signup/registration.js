@@ -90,7 +90,7 @@ var registerUser = function(userType) {
             .then(function(result){
  
                 if(result.user) {
-                    
+
                     locals.confirmationLink = 'https://newartist-mikemontilla.c9.io/authentication/signup/confirmation/'+userType+'/'+ result.user.token;
                     locals.userType = userType;
                     mailSender(result.user.email, locals, mailTypes.CONFIRMATION_MAIL)

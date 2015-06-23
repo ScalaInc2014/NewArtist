@@ -1,4 +1,19 @@
 
+header{
+
+	border-bottom:  1px solid grey;
+	padding: 0.5em;
+	text-align: center;
+
+}
+
+
+#artistSignup{
+
+    margin-left: 30%;
+	width: 40%;
+}
+
 #manualRegister{
 
 	display:  inline-block;
@@ -76,9 +91,17 @@
 #menu .name:after {
 	content: ' -';
 }
+
 #menu a {
 
 	margin-left: 5px;
+}
+
+#passwordRecover{
+
+	margin-left: 35%;
+	width: 30%;
+	text-align: center;
 }
 
 .users{

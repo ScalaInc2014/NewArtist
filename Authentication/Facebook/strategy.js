@@ -2,15 +2,15 @@ var mongoose = require('mongoose');
 var PassportStrategy = require('passport-facebook').Strategy;
 var strategyProperties = require('./config');
 var models = require("../../Models");
+var messages = require("../../Messages");
 
 
-var getUserConfiguration = function(profile, accessToken, userType) {
+var setUserDataStructure = function(profile, accessToken, userType) {
     
     var user = {};
     var currentDate = new Date();
     var Id = mongoose.Types.ObjectId();
     var profilePicturePath = 'https://graph.facebook.com/' + profile.id + '/picture' + '?width=200&height=200' + '&access_token=' + accessToken;
-   
     if(userType === 'fan') {
         
         user.dataStructure = {
@@ -22,7 +22,7 @@ var getUserConfiguration = function(profile, accessToken, userType) {
                 birthday: profile._json.birthday,
                 gender: profile._json.gender,
                 avatarPath: profilePicturePath,
-                location: profile._json.location.name
+                location: (profile._json.location && profile._json.location.name)
             },
             registerDate: currentDate,
             registerMode: 'facebook',
@@ -34,11 +34,18 @@ var getUserConfiguration = function(profile, accessToken, userType) {
     return user;
 };
 
+var checkUserPermissions = function(profile){
+    
+    if( typeof profile._json.email === "undefined")
+        return false;
+    return true;
+};
+
 var getStrategy = function(userType){
 
     var strategy = new PassportStrategy(strategyProperties ,
         
-        function(accessToken, refreshToken, profile, done){
+        function(req, accessToken, refreshToken, profile, done){
 
             var userModel = models[userType]; 
             var email = profile._json.email;
@@ -50,22 +57,29 @@ var getStrategy = function(userType){
                         return done(null, result.user);
                     else{
 
-                        var user = getUserConfiguration(profile, accessToken, userType);
-                        userModel.registerPromise(user.dataStructure)
-                    
-                        .then(function(result){
-             
-                            if(result.user)                   
-                                return done(null, user.dataStructure);                
-                            else 
-                                return done(null, false, { message: result.informationMessage });                             
-                        })
+                        var isPermissionAllowed = checkUserPermissions(profile);
+                        if(isPermissionAllowed === true){
+                            var user = setUserDataStructure(profile, accessToken, userType);
+                            userModel.registerPromise(user.dataStructure)
                         
-                        .then(null,function(err){
+                            .then(function(result){
+                 
+                                if(result.user)                   
+                                    return done(null, user.dataStructure);                
+                                else 
+                                    return done(null, false, { message: result.informationMessage });                             
+                            })
                             
-                            return done(err);
-                            
-                        });                         
+                            .then(null,function(err){
+                                
+                                return done(err);
+                                
+                            }); 
+                        }
+                        else{
+
+                            return done(null, false, { message: messages.notification.EMAIL_PERMISSION_DENIED });
+                        }   
                     }
                 })
                 

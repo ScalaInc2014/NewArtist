@@ -8,12 +8,7 @@ var getUserConfiguration = function(profile, accessToken, userType) {
     var user = {};
     var currentDate = new Date();
     var Id = mongoose.Types.ObjectId();  
-    var location;
-    
-    if(profile._json.placesLived)
-        location = profile._json.placesLived[0].value;
-    else
-        location = "Desconocida";
+
 
     if(userType === 'fan') {
         
@@ -22,11 +17,11 @@ var getUserConfiguration = function(profile, accessToken, userType) {
             info:{
                 name: profile._json.displayName,
                 password: '',
-                email: profile._json.emails[0].value,
+                email: profile._json.emails[0].value ,
                 birthday: profile._json.birthday,
                 gender: profile._json.gender,
                 avatarPath: profile._json.image.url,
-                location: location
+                location: (profile._json.placesLived && profile._json.placesLived[0].value)
             },
             registerDate: currentDate,
             registerMode: 'google',
@@ -34,7 +29,7 @@ var getUserConfiguration = function(profile, accessToken, userType) {
             token: accessToken,
         };
     }
-  
+    
     return user;
 };
 
@@ -43,6 +38,7 @@ var getStrategy = function(userType){
     var strategy = new GoogleStrategy(strategyProperties,
 
         function(token, refreshToken, profile, done){
+
 
             var userModel = models[userType]; 
             var email = profile._json.emails[0].value;

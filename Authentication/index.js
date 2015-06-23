@@ -55,15 +55,21 @@ var signinUserManually = function(userType){
 
 */
 
-var accessThroughSocialNetwork = function(provider, process){
+var accessThroughSocialNetwork = function(provider, process, rerequest){
     
     var scopes = {
-        facebook : ['user_birthday','user_location','user_about_me','email'],
+        facebook : ['email','user_birthday','user_location','user_about_me'],
         google : ['profile', 'email']
     };
     
-    if( process === 'authentication' )
-        return passport.authenticate(provider, { scope : scopes[provider] });
+    if( process === 'authentication' ) {
+        
+        var authenticationOptions = {};
+        authenticationOptions.scope = scopes[provider];
+        if(rerequest)
+            authenticationOptions.authType = 'rerequest';
+        return passport.authenticate( provider, authenticationOptions);        
+    }
     
     else if( process === 'redirection')
     
@@ -93,11 +99,17 @@ var signout = function(req, res){
 
 
 module.exports = {
+
     signupUserManually : signupUserManually,
     signinUserManually : signinUserManually,
     accessThroughSocialNetwork : accessThroughSocialNetwork,
     signout : signout,
-    verifyEmail : manual.signup.verifyEmail
+    verifyEmail : manual.signup.verifyEmail,
+    
+    //password recovery
+    sendPasswordRecoveryMail : manual.passwordRecovery.sendPasswordRecoveryMail,
+    verifyPasswordRequestAndRenderForm : manual.passwordRecovery.verifyPasswordRequestAndRenderForm,
+    resetPassword : manual.passwordRecovery.resetPassword
 };
 
 

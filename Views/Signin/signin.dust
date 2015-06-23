@@ -10,8 +10,12 @@
 
 	<body>
 
-		<p> {errorMessage} </p>
-		<div id="fanSignin" class="users"> 
+		<p> {errorMessage} </p> 
+		<header> 
+            <h1> New Artists </h1> 
+            <img src="/img/ticket3.svg">
+        </header>
+        <div id="fanSignin" class="users"> 
             <h2> FANS </h2>
             <div>
                 <form action="/authentication/signin/fan/" method="post" class='loginSection'>
@@ -26,6 +30,8 @@
                             <input type="submit" value="Iniciar Sesión"/>
 
                 </form>
+                <a href="/authentication/password_recovery"> ¿ Has olvidado tu contraseña ?</a>
+                <p> ¿ No tienes una cuenta? <a href="/authentication/signup/fan"> Regístrate </a> </p>
             </div>
             <div class="facebook" id="facebookSignin">         
                 <a href='/authentication/facebook'>     
@@ -51,7 +57,10 @@
                         <br>
         		        <input type="submit" value="Iniciar Sesión"/>
     		</form>	
+            <a href="/authentication/password_recovery"> ¿ Has olvidado tu contraseña ?</a>
+            <p> ¿ No tienes una cuenta? <a href="/authentication/signup/artist"> Regístrate </a> </p>
         </div>	
+
 	</body>
 </html>
 

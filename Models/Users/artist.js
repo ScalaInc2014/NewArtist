@@ -19,7 +19,6 @@ var sharesItem = new Schema({
 
 var ArtistSchema = new Schema({
 
-        artistId: Schema.Types.ObjectId,
         info:{
          
             name: String,
@@ -35,8 +34,8 @@ var ArtistSchema = new Schema({
             location: String
             
         },
-        token: String,
         mailConfirmation: { type: Boolean, default: false },
+        passwordRequest: Date,    
         registerMethod: String,
         registerMode: String,
         premium: Boolean,

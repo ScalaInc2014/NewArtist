@@ -11,6 +11,10 @@
 	<body>
 
 		<p> {errorMessage} </p>
+		<header> 
+        	<h1> New Artists </h1> 
+        	<img src="/img/ticket3.svg">
+        </header>
 		<div id="manualRegister"> 
 			<h2> Regístro Manual </h2>
 			<form action="/authentication/signup/fan" method="post">
