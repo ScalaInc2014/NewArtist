@@ -24,26 +24,34 @@ var signupUserManually = function(userType){
 
 var signinUserManually = function(userType){
     
-    if(userType === 'artist') {
+    return getSocialCallbackHandler(userType);
+};
+
+
+var getSocialCallbackHandler = function( strategyName ) {
+    
+    return function(req, res, next) {
         
-        return passport.authenticate('artistLogin', 
-		    { 
-			    successRedirect: '/',
-			    failureRedirect: '/authentication/signin/',
-			    failureFlash: true 
-		    }
-	    );
-    }
-    else if(userType === 'fan'){
-        
-        return passport.authenticate('fanLogin', 
-    		{ 
-    			successRedirect: '/', 
-    			failureRedirect: '/authentication/signin',
-    			failureFlash: true 
-    		}
-    	);
-    }
+        passport.authenticate( strategyName, function(err, user, info){
+            
+            if(err)
+                return next(err);
+            if(user){
+                req.pLogin(user)
+                
+                .then(function () {
+                    res.redirect('/');
+                })
+                .then(null, function(err){
+                    next(err);
+                });
+            }
+            else {
+                req.setNotification(info.message);
+                next();
+            }
+        })(req, res, next);
+    };
 };
 
 
@@ -72,15 +80,7 @@ var accessThroughSocialNetwork = function(provider, process, rerequest){
     }
     
     else if( process === 'redirection')
-    
-        return passport.authenticate( provider,
-            {
-                successRedirect: '/',
-                failureRedirect: '/authentication/signin',
-                failureFlash: true
-            }
-        ); 
-
+        return getSocialCallbackHandler( provider ); 
 };
 
 /**
@@ -105,7 +105,6 @@ module.exports = {
     accessThroughSocialNetwork : accessThroughSocialNetwork,
     signout : signout,
     verifyEmail : manual.signup.verifyEmail,
-    
     //password recovery
     sendPasswordRecoveryMail : manual.passwordRecovery.sendPasswordRecoveryMail,
     verifyPasswordRequestAndRenderForm : manual.passwordRecovery.verifyPasswordRequestAndRenderForm,

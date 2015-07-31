@@ -1,10 +1,9 @@
 var models = require("../../../Models");
-var messages = require('../../../Messages');
 var communication = require('../../../Communication');
 var Q = require('q');
 
 var checkPasswordRequestValidity = function(token, userType) {
-    
+        
     var userModel = models[userType];
     var findUserByToken = userModel.findOne({ '_id':token}).exec();
     var result = { checked : false };
@@ -58,7 +57,7 @@ var tryPasswordUpdateAndLogin = function(req) {
                 return user.updatePassword(newPassword)
                 .then(function(){
                     delete user.info.password;
-                    return req.ulogin(user)
+                    return req.pLogin(user)
                     .then(function(){
                         result.reset = true;
                         return result;
@@ -72,7 +71,7 @@ var tryPasswordUpdateAndLogin = function(req) {
         });
 };
 
-var resetPassword = function (req, res) {
+var resetPassword = function (req, res, next) {
     
     var message;
     var successPasswordUpdatedRedirect = '/';
@@ -90,7 +89,11 @@ var resetPassword = function (req, res) {
                 res.end(result.message.id);
             }
         })
-        .then(null, console.error);
+        .then(null,function(err){
+                
+            next(err);
+                
+        });
     }
     else {
         message = communication.buildMessage('NO_PASSWORD_RECOVERY_REQUEST');

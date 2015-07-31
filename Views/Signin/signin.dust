@@ -10,7 +10,14 @@
 
 	<body>
 
-		<p> {errorMessage} </p> 
+		
+		{@eq key=message.id value="EMAIL_PERMISSION_DENIED"}
+             <p> Deberías darnos acceso a tu correo electrónico ;) </p>
+             <a href='/authentication/facebook/rerequest'> Volver a intentarlo :) !!!!!!</a> 
+        {/eq}
+		{@eq key=message.id value="INVALID_AUTHENTICATION_TYPE"}
+            <p>Parece que este email fue registrado usando {message.params.socialNetwork}</p> 
+        {/eq}        
 		<header> 
             <h1> New Artists </h1> 
             <img src="/img/ticket3.svg">

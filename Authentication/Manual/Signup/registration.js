@@ -2,7 +2,7 @@ var mongoose = require('mongoose');
 var mailSender = require('../../../Mail_sender');
 var mailTypes = mailSender.mailTypes;
 var models = require("../../../Models");
-
+var communication = require('../../../Communication');
 
 /**
   <p> Returns the User's Object in relation with the User doing the Register Process: </p>
@@ -77,48 +77,44 @@ var getUserConfiguration = function(req, userType) {
 
 var registerUser = function(userType) {
     
-    return function(req, res){
+    return function(req, res, next){
 
         var userModel = models[userType];
         var user = getUserConfiguration(req, userType);
-        var registerFailRedirect = '/authentication/signup/'+ userType;
         var mailVerificationRedirect = '/authentication/signup/confirmation/sent';
+        var confirmationLink = '/authentication/signup/confirmation/';
         var locals = {}; //variables for template
+        var message;
         
-        userModel.registerPromise(user.dataStructure)
+        userModel.registerUser(user.dataStructure)
         
             .then(function(result){
  
-                if(result.user) {
+                if(result.newUser) {
 
-                    locals.confirmationLink = 'https://newartist-mikemontilla.c9.io/authentication/signup/confirmation/'+userType+'/'+ result.user.token;
+                    locals.confirmationLink = req.headers.origin + confirmationLink + userType +'/'+ result.newUser._id;
                     locals.userType = userType;
-                    mailSender(result.user.email, locals, mailTypes.CONFIRMATION_MAIL)
+                    mailSender(result.newUser.info.email, locals, mailTypes.CONFIRMATION_MAIL)
                      
                         .then(function (info) {
-
                             res.redirect(mailVerificationRedirect);
-
                         })
                         
                         .then(null,function(err){
-
-                            console.log(err);
+                            next(err);
                         });
                 }
                 else {
 
-                    req.flash('error', result.informationMessage);
-                    res.redirect(registerFailRedirect);
+                    message = result.message;
+                    req.setNotification( message );
+                    next();
                 }                
                 
             })
             
             .then(null,function(err){
-                
-                console.log("Operational Error");
-                console.log(err);
-                
+                next(err);
             });
     };
 };

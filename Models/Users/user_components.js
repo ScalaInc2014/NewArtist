@@ -1,58 +1,39 @@
 var bcrypt = require("bcrypt");
 var Q = require('q');
-
-var messages = require('../../Messages');
 var communication = require('../../Communication');
 
 
 //***************************** Public *******************************//
 
 /**
-  <p> Saves in a new Document, the User's information through .save Method. </p>
+  <p> Saves in a new Document, the User's information through .pSave Promise. </p>
  * @param {object} NewUserObject - New user's information object.
  * @memberof module:Models.
  * @inner
  * @return {Promise} 
 */
 
-var saveUser = function (newUserObject){
+var createUserFromStructureAndSave = function (newUserObject){
 
-    var deferred = Q.defer();
     var newUser = new this(newUserObject);
-
-    newUser.save(function(err){
-
-        if(err)
-            deferred.reject(err);
-        else{
-            var userSaved = {
-                
-                token: newUser._id,
-                email: newUser.info.email
-       
-            };
-            deferred.resolve(userSaved);
-        }
-    });  
-    
-    return deferred.promise; 
+    return newUser.pSave();
 };
 
 /**
-  <p> This is a instance method. Used to save the user's information in form of promise.</p>
+  <p> This is an instance method. Used to save the user's information in form of promise.</p>
  * @memberof module:Models.
  * @inner
  * @return {Promise} 
 */
 
-var uSave = function(){
+var pSave = function(){
     
     var deferred = Q.defer();
     this.save(function(err){
         if(err)
             deferred.reject(err);
         else
-            deferred.resolve();
+            deferred.resolve( this );
     });
     return deferred.promise;
 };
@@ -69,7 +50,7 @@ var updatePassword = function(newPassword){
     
     this.info.password = newPassword;
     this.passwordRequest = undefined;
-    return this.uSave();
+    return this.pSave();
 };
 
 /**
@@ -82,18 +63,19 @@ var updatePassword = function(newPassword){
 var checkPasswordRequestValidity = function(){
     
     var result = { checked : false };
+    var currentDate = (new Date()).getTime();
+    var passwordRequestDate = this.passwordRequest.getTime();
+    var oneDayInMilliseconds = 24 * 60 * 60 * 1000;    
     
     if(this.passwordRequest){
-        var currentDate = (new Date()).getTime();
-        var passwordRequestDate = this.passwordRequest.getTime();
-        var oneDayInMilliseconds = 24 * 60 * 60 * 1000;
-
+        
         if(currentDate - passwordRequestDate <= oneDayInMilliseconds)
             result.checked = true;
         else
             result.message = communication.buildMessage('EXPIRED_PASSWORD_RECOVERY_TOKEN');
         return result;
     }
+    
     result.message = communication.buildMessage('NO_PASSWORD_RECOVERY_REQUEST');
     return result;
 };
@@ -111,11 +93,11 @@ var checkPasswordRequestValidity = function(){
 var hashPassword = function (next) {
 
     var document = this;
-    var bcryptGenSalt = Q.denodeify(bcrypt.genSalt);
-    var GenSaltPromise = bcryptGenSalt(10);
-    
-    if(document.info.password !== ""){  // If the RegisterMode is Manual and the user provided a password
-    
+
+    if( typeof document.info.password !== "undefined"){  // If the RegisterMode is Manual and the user provided a password
+
+        var bcryptGenSalt = Q.denodeify(bcrypt.genSalt);
+        var GenSaltPromise = bcryptGenSalt(10);
         GenSaltPromise
     
             .then(function(salt){
@@ -141,28 +123,6 @@ var hashPassword = function (next) {
         next();
 };
 
-/**
-    <p> Populates a result object and resolve a promise </p>
-    <ul>
-        <li> Populates result.user.
-        <li> Populates result.message.
-        <li> Resolve the promise.
-    </ul>
- * @param {object} deferred - Q's Promise Object.
- * @param {object} user - User info.
- * @param {string} message - Notification to Client.
- * @memberof module:Models.
- * @inner
-
-*/
-
-var resolvePromise = function (deferred, user, message){
-
-    var result = {};
-    result.user = user;
-    result.informationMessage = message;
-    deferred.resolve(result);
-};
 
 
 /**
@@ -179,38 +139,30 @@ var resolvePromise = function (deferred, user, message){
 
 */
 
-var registerPromise = function (newUserObject){
+var registerUser = function (newUserObject){
     
-    var deferred = Q.defer();
+    var result = { newUser : null };
     var self = this;   
-
     var findUserByEmail = self.findOne({ 'info.email' : newUserObject.info.email }).exec();
-    
-    findUserByEmail
+
+    return findUserByEmail
         .then(function(user){
 
-            if(user)
-                resolvePromise(deferred, null, messages.notification.ALREADY_REGISTERED); 
+            if(user) {
                 
+                result.message = communication.buildMessage( self.modelName.toUpperCase() + '_ALREADY_REGISTERED');
+                return result;
+            }
             else{
 
-                self.saveUser(newUserObject)
-
-                    .then(function(userSaved){
-                         resolvePromise(deferred, userSaved, null);
-                    })
-                    
-                    .then(null, function(err){
-                        deferred.reject(err);
+                return self.createUserFromStructureAndSave(newUserObject)
+                
+                    .then(function(newUser){
+                        result.newUser = newUser;
+                        return result;
                     });
             }
-        })
-
-        .then(null, function(err){
-            deferred.reject(err);
-        }); 
-        
-   return deferred.promise; 
+        });
 };
 
 /**
@@ -230,47 +182,41 @@ var registerPromise = function (newUserObject){
 
 var manualSignin = function (email, password) {
     
-    var deferred = Q.defer();
+    var result = { signedUser : null };
     var self = this;   
     var findUserByEmail = self.findOne({ 'info.email' : email }).exec();
     
-    findUserByEmail
+    return findUserByEmail
+    
         .then(function(user){
 
             if(user){
 
                 if(user.registerMode === "manual"){
                     
-                    user.validatePassword(password)
-                            
-                        .then(function(loggedUser){
+                    return user.validatePassword(password)
+                        .then(function(validPassword){
     
-                            if(loggedUser)
-                                resolvePromise(deferred, user, null);
-                            else
-                                resolvePromise(deferred, null, messages.notification.INVALID_PASSWORD);
-                        })  
-                                
-                        .then(null,function(err){            
-                            deferred.reject(err);
-                        });                      
+                            if(validPassword){
+                                result.signedUser = user;
+                                return result;
+                            }
+                            else{
+                                result.message = communication.buildMessage('INVALID_PASSWORD');
+                                return result;
+                            }
+                        });
                 }  
                 else{
-                    var message =  messages.notification.INVALID_AUTHENTICATION_TYPE + user.registerMode;
-                    resolvePromise(deferred, null, message);
+                    result.message = communication.buildMessage('INVALID_AUTHENTICATION_TYPE', {socialNetwork : user.registerMode});
+                    return result;
                 }
             }              
-            else
-                resolvePromise(deferred, null, messages.notification.INVALID_EMAIL);
-        })
-
-        .then(null, function(err){
-
-            deferred.reject(err);
-        });  
-    
-    return deferred.promise;
-    
+            else{
+                result.message = communication.buildMessage('INVALID_EMAIL');
+                return result;
+            }
+        });
 };
 
 /**
@@ -289,24 +235,22 @@ var manualSignin = function (email, password) {
 
 var socialSignin = function (email, provider) {
     
-    var deferred = Q.defer();
+    var result = { signedUser : null };
     var self = this;   
     var findUserByEmail = self.findOne({ 'info.email' : email }).exec();
 
-    findUserByEmail    
-        .then(function(user){
-
-            if(user && (provider === user.registerMode))
-                resolvePromise(deferred, user, null);
-            else
-                resolvePromise(deferred, null, messages.notification.INVALID_EMAIL);              
-        })
-
-        .then(null, function(err){
-            deferred.reject(err);
-        });  
+    return findUserByEmail    
     
-    return deferred.promise;  
+        .then(function(user){
+            if(user && (provider === user.registerMode)){
+                result.signedUser = user;
+                return result;
+            }
+            else{
+                result.message = communication.buildMessage('INVALID_EMAIL');
+                return result;
+            }
+        });
 };
 
 /**
@@ -325,54 +269,42 @@ var socialSignin = function (email, provider) {
 
 var validatePassword = function (password) {
 
-    var deferred = Q.defer();
     var user = this;
     var hashPromise = Q.denodeify(bcrypt.hash);
 
-    hashPromise(password, user.info.salt)
+    return hashPromise(password, user.info.salt)
 
 
         .then(function(hash){
 
             if(hash === user.info.password)
-                deferred.resolve(true);
+                return true;
             else
-                deferred.resolve(false);
-        })
-        
-        .catch(function(err){
-            
-            deferred.reject(err);
-        }); 
-
-    return deferred.promise;
-    
+                return false;
+        });
 };
 
 
 var resetPassword = function (token, salt, password) {
 
-    var deferred = Q.defer();
+    var result = { reseted: false };
     var self = this;   
     var query = self.findByIdAndUpdate( token , { $set: { 'info.password': password ,'info.salt': salt}});
     var updatePassword = query.exec();
    
-    updatePassword
+    return updatePassword
     
-    .then(function(user){
-
-        if(user)
-            resolvePromise(deferred, user, null);
-        else
-            resolvePromise(deferred, null, messages.notification.PASSWORD_UPDATE_FAIL);              
-    })
-
-    .then(null, function(err){
-        deferred.reject(err);
-    });  
+        .then(function(user){
     
-    return deferred.promise;
-    
+            if(user){
+                result.reseted = true;
+                return result;
+            }
+            else{
+                result.message = communication.buildMessage('PASSWORD_UPDATE_FAIL');
+                return result;
+            }
+        });
 };
 
 
@@ -381,14 +313,14 @@ module.exports = {
     methods:{
         checkPasswordRequestValidity : checkPasswordRequestValidity,
         validatePassword : validatePassword,
-        uSave : uSave,
+        pSave : pSave,
         updatePassword : updatePassword
     },
     statics: {
-        registerPromise : registerPromise,
+        registerUser : registerUser,
         manualSignin : manualSignin,
         socialSignin : socialSignin,
-        saveUser : saveUser,
+        createUserFromStructureAndSave : createUserFromStructureAndSave,
         resetPassword : resetPassword
     },
     saveMiddlewares: {

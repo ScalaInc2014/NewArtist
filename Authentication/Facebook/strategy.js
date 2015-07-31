@@ -3,6 +3,7 @@ var PassportStrategy = require('passport-facebook').Strategy;
 var strategyProperties = require('./config');
 var models = require("../../Models");
 var messages = require("../../Messages");
+var communication = require("../../Communication");
 
 
 var setUserDataStructure = function(profile, accessToken, userType) {
@@ -17,7 +18,6 @@ var setUserDataStructure = function(profile, accessToken, userType) {
             fanId: Id,
             info:{
                 name: profile.displayName,
-                password: '',
                 email: profile._json.email,
                 birthday: profile._json.birthday,
                 gender: profile._json.gender,
@@ -35,7 +35,8 @@ var setUserDataStructure = function(profile, accessToken, userType) {
 };
 
 var checkUserPermissions = function(profile){
-    
+    console.log("Checking user permissions");
+    console.log(profile);
     if( typeof profile._json.email === "undefined")
         return false;
     return true;
@@ -53,21 +54,22 @@ var getStrategy = function(userType){
                 
                 .then(function(result){
 
-                    if(result.user)
-                        return done(null, result.user);
+                    if(result.signedUser)
+                        return done(null, result.signedUser);
                     else{
 
                         var isPermissionAllowed = checkUserPermissions(profile);
                         if(isPermissionAllowed === true){
+                            
                             var user = setUserDataStructure(profile, accessToken, userType);
-                            userModel.registerPromise(user.dataStructure)
+                            userModel.registerUser(user.dataStructure)
                         
                             .then(function(result){
                  
-                                if(result.user)                   
+                                if(result.newUser)                   
                                     return done(null, user.dataStructure);                
                                 else 
-                                    return done(null, false, { message: result.informationMessage });                             
+                                    return done(null, false, { message: result.message });                             
                             })
                             
                             .then(null,function(err){
@@ -75,10 +77,10 @@ var getStrategy = function(userType){
                                 return done(err);
                                 
                             }); 
+                            
                         }
                         else{
-
-                            return done(null, false, { message: messages.notification.EMAIL_PERMISSION_DENIED });
+                            return done(null, false, { message: communication.buildMessage('EMAIL_PERMISSION_DENIED') });
                         }   
                     }
                 })

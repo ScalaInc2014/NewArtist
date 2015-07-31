@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title> {title}</title>
+		<link rel='stylesheet' href='/bootstrap/css/bootstrap.min.css'/>
+		<link rel='stylesheet' href='/stylesheets/style.css'/>
+		<script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
+		<script  src='/bootstrap/js/bootstrap.min.js'></script>
+	    
+	</head>
+
+	<body>
+  
+        <header> 
+            <h1> New Artists </h1> 
+            <img src="/img/ticket3.svg">
+        </header>
+        <div id = "ErrorHandlerDiv">
+            <h1> {status} Error </h1>
+            <p> {msg} </p> 
+            <p> Ups!!! Algo raro ha pasado, estamos trabajando en ello ;) </p>
+        </div>
+
+	</body>
+</html>
+

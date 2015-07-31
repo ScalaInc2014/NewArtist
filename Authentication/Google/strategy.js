@@ -3,7 +3,7 @@ var GoogleStrategy   = require('passport-google-oauth').OAuth2Strategy;
 var models = require("../../Models");
 var strategyProperties = require('./config');
 
-var getUserConfiguration = function(profile, accessToken, userType) {
+var setUserDataStructure = function(profile, accessToken, userType) {
     
     var user = {};
     var currentDate = new Date();
@@ -16,7 +16,6 @@ var getUserConfiguration = function(profile, accessToken, userType) {
             fanId: Id,
             info:{
                 name: profile._json.displayName,
-                password: '',
                 email: profile._json.emails[0].value ,
                 birthday: profile._json.birthday,
                 gender: profile._json.gender,
@@ -39,26 +38,25 @@ var getStrategy = function(userType){
 
         function(token, refreshToken, profile, done){
 
-
             var userModel = models[userType]; 
             var email = profile._json.emails[0].value;
             userModel.socialSignin(email, 'google')
                 
                 .then(function(result){
 
-                    if(result.user)
-                        return done(null,result.user);
+                    if(result.signedUser)
+                        return done(null,result.signedUser);
                     else{
 
-                        var user = getUserConfiguration(profile, token, 'fan');
-                        userModel.registerPromise(user.dataStructure)
+                        var user = setUserDataStructure(profile, token, 'fan');
+                        userModel.registerUser(user.dataStructure)
                     
                         .then(function(result){
              
-                            if(result.user)                   
+                            if(result.newUser)                   
                                 return done(null, user.dataStructure);                
                             else 
-                                return done(null, false, { message: result.informationMessage });                             
+                                return done(null, false, { message: result.message });                             
                         })
                         
                         .then(null,function(err){

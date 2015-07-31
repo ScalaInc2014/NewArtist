@@ -19,12 +19,12 @@ var sendRecoveryEmail =  function(req, userType) {
         .then(function( user ){
             if(user){
                 if(user.registerMode === "manual"){
-                    user.passwordRequest = new Date(); 
+                    var setPasswordRequestDate = userModel.findByIdAndUpdate( user._id, { $set: {  passwordRequest: new Date() }});
                     locals.userType = userType;
                     locals.resetLink = req.hostname + resetPath + userType + '/' + user._id; 
                     return Q.all([
                         mailSender(user.info.email, locals, mailTypes.RECOVER_PASSWORD),
-                        user.uSave()
+                        setPasswordRequestDate.exec()
                     ]) 
                     .then( function() {
                         result.done = true;
@@ -41,16 +41,14 @@ var sendRecoveryEmail =  function(req, userType) {
                 result.message = communication.buildMessage('NO_EMAIL_REGISTERED');
                 return result;
             }
-            
         });
 };
 
 
 var sendPasswordRecoveryMail = function (userType){
     
-    return function(req, res){
+    return function(req, res, next){
 
-        var notificationRedirectPath = '/authentication/password_recovery/';
         var message;
         sendRecoveryEmail(req, userType)
         .then(function( result ){
@@ -58,11 +56,14 @@ var sendPasswordRecoveryMail = function (userType){
                 message = communication.buildMessage('SUCCESS_PASSWORD_RECOVERY_REQUEST');
             else
                 message = result.message;
-            console.log(message);
             req.setNotification( message );
-            res.redirect( notificationRedirectPath );    
+            next();
         })
-        .then(null, console.error);
+        
+        .then(null,function(err){
+                
+                next(err);
+        });
     };
 };
 

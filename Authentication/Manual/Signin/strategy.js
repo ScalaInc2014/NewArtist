@@ -32,10 +32,10 @@ var getUserStrategy = function (userType) {
                 
                 .then(function(result){
 
-                    if(result.user)
-                        return done(null,result.user);
+                    if(result.signedUser)
+                        return done(null,result.signedUser);
                     else{
-                        return done(null, false, { message: result.informationMessage });
+                        return done(null, false, { message: result.message });
                     }
                 })
                 

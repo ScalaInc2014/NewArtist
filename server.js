@@ -1,89 +1,50 @@
 // -------------- Npm and node dependencies ---------------------------//
-var bodyParser = require('body-parser'); // Middleware to parse different data formats
 var express = require("express");
-var cookieParser = require("cookie-parser"); // Middleware to parse Cookie and populate req.cookies.
-var session = require("express-session"); // Sets up an HTTP session for a user and provides a persistent req.session object in between requests. Depends on cookieParser.
-var MongoStore = require('connect-mongo')(session); // 
 var flash = require("connect-flash");  // Middleware used for storing messages in req-
-var passport = require("passport");
-var path = require("path");
 var server = express();
-var engines = require("consolidate"); // Normalize Template's Render Functions
-var Q = require('q');
 
 //-------------- Local dependencies -----------------------------------//
 var setRoutes = require('./Routes');
-var setPassportConfigurations = require('./Authentication/Passport/init');
-var notification = require("./notification");
+var initializePassport = require('./Authentication/Passport/init');
+var middlewares = require("./Utilities/Middlewares");
+var configurations = require("./Configurations");
+var communication = require("./Communication");
 
+//---------------- App Configuration -----------------------//
 
-//---------------- Serve Static Files -----------------///////////////
+configurations.dataBase();
+configurations.middlewares.connect.setStaticsPath(server);
+configurations.middlewares.connect.setViewsEngine(server);
+configurations.middlewares.connect.setCookieParser(server);
+configurations.middlewares.connect.setBodyParser(server);
+configurations.middlewares.connect.setSession(server);
+server.use(flash());   //** Provisional , mientras se implementa middleware de Notificaciones 
+configurations.middlewares.connect.setPassport(server);
+configurations.middlewares.own.setNotifications(server);
+configurations.middlewares.own.setLoginPromiseToRequest(server);
 
-server.use(express.static(path.join(__dirname, 'Public'))); // Called before authenticationRoutes, in order to prevent the router handles /public/bootstrap
+//----------------       Routes      ----------------------//
 
-/* View´s Directory and Views Engine Configuration*/
-var viewEngineName = 'dust';
-server.engine(viewEngineName , engines.dust);
-server.set('view engine', viewEngineName);
-server.set('views', __dirname + '/Views/');
-
-
-// The middleware is used to parse the url encoded
-server.use(cookieParser()); // Signed Cookies in order to work with Express.session
-server.use(bodyParser.urlencoded({ extended : true }));
-
-// Session Options
-
-var sessionOpts = {
- 	
- 	secret: 'keyboard cat',
- 	store: new MongoStore({ db: 'NewArtist'}),
- 	key: 'NewArtist_sid',
-    cookie: { 
-    	// expires: new Date(Date.now() + 60000),
-        // maxAge: new Date(Date.now() + 60000) 
-    }
-};
-
-server.use(session(sessionOpts)); 
-server.use(flash());
-server.use(notification());
-server.use(passport.initialize()); 
-server.use(passport.session()); //persistent login session
-server.use(function(req, res, next){
-    
-    var ulogin = function(user){
-        
-        var deferred = Q.defer();
-        req.login(user, function(err){
-            if(err)
-                deferred.reject(err);
-            else
-                deferred.resolve();
-        });
-        return deferred.promise;
-    };
-    
-    req.ulogin = ulogin;
-    next();
-});
-
-// Strategies and configurations are set up
-setPassportConfigurations(passport);
-
-///** ROUTES***///
+initializePassport();
 
 //Home Page
 server.get('/', function(req, res) {
     // Display the Login page with any flash message, if any
-	res.locals.session = req.user;
+    res.locals.session = req.user;
 	res.render('index.dust', {title:'NEWARTIST'});
 });
 
 setRoutes(server);
+server.use(communication.processNotifications);
 
-///** ROUTES ****///
+// 404 Page Not Found
+server.use( function(req, res, next) {
+    // Display the Login page with any flash message, if any
+    res.render('./Resource_not_found');
+});
+
+server.use(middlewares.errorHandler);
 
 server.listen(8080, function(){
-	console.log("NewArtist running in port 8080");
+	  console.log("NewArtist running in port 8080");
 });

@@ -104,6 +104,13 @@ header{
 	text-align: center;
 }
 
+#ErrorHandlerDiv{
+
+	margin-left: 35%;
+	width: 30%;
+	text-align: center;
+}
+
 .users{
 
 	border-radius: 10px;

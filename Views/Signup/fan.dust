@@ -10,7 +10,9 @@
 
 	<body>
 
-		<p> {errorMessage} </p>
+		{@eq key=message.id value="FAN_ALREADY_REGISTERED"}
+            <p>Ups! Correo Electrónico Duplicado, intenta registrarte con otro.</p>
+        {/eq}
 		<header> 
         	<h1> New Artists </h1> 
         	<img src="/img/ticket3.svg">

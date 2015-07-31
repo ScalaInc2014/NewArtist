@@ -16,6 +16,8 @@ var notification = function (options) {
   var safe = (options.unsafe === undefined) ? true : !options.unsafe;
   
   return function(req, res, next) {
+    
+    console.log(" ** Setting Notification Middleware **");
     if (req.setNotification && req.clearNotification && safe) { return next(); }
     req.setNotification = _setNotification;
     req.clearNotification = _clearNotification;

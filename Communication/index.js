@@ -1,2 +1,7 @@
 var buildMessage = require("./message"); 
-module.exports = {buildMessage : buildMessage};
+var processNotifications = require("./process_notifications");
+
+module.exports = {
+    buildMessage : buildMessage,
+    processNotifications : processNotifications
+};

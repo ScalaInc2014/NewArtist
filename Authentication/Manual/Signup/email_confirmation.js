@@ -20,7 +20,7 @@ var verifyEmail = function (userType){
     
     var userModel = models[userType];
     
-    return function(req, res){
+    return function(req, res, next){
         
         var userId = req.params.user_id;
         var mailVerificatedRedirect = '/';
@@ -42,7 +42,6 @@ var verifyEmail = function (userType){
                         req.flash('error', 'Link de Verificación ha Expirado');
                         res.redirect(errorVerificationRedirect);
                    }
-
                 }
                 else{
                     req.flash('error', 'Link de Verificación Inválido');
@@ -55,7 +54,8 @@ var verifyEmail = function (userType){
 
                 if(user){
                     
-                    return req.ulogin(user)
+                    delete user.info.password;
+                    return req.pLogin(user)
                     .then(function(){
                         res.redirect(mailVerificatedRedirect);
                     });
@@ -65,7 +65,7 @@ var verifyEmail = function (userType){
     
             .then(null, function(err){
 
-                return console.log(err);
+                next(err);
             }); 
     };
 };
