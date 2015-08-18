@@ -1,4 +1,3 @@
-
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 var userComponents = require('./user_components');
@@ -37,7 +36,6 @@ var fanSchema = new Schema({
         contentShared:[Schema.Types.ObjectId],
         registerDate: Date  // Fecha de Registro a New Artists
         //preferencesAlgorithm:"",
-        
 });
 
 fanSchema.pre('save', userComponents.saveMiddlewares.hashPassword);

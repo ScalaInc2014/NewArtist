@@ -18,7 +18,7 @@ var getUserConfiguration = function(req, userType) {
     var user = {};
     var currentDate = new Date();
     var Id = mongoose.Types.ObjectId();
-    
+
     if(userType === 'fan') {
         
         user.dataStructure = {

@@ -1,6 +1,5 @@
 // -------------- Npm and node dependencies ---------------------------//
 var express = require("express");
-var flash = require("connect-flash");  // Middleware used for storing messages in req-
 var server = express();
 
 //-------------- Local dependencies -----------------------------------//
@@ -18,7 +17,6 @@ configurations.middlewares.connect.setViewsEngine(server);
 configurations.middlewares.connect.setCookieParser(server);
 configurations.middlewares.connect.setBodyParser(server);
 configurations.middlewares.connect.setSession(server);
-server.use(flash());   //** Provisional , mientras se implementa middleware de Notificaciones 
 configurations.middlewares.connect.setPassport(server);
 configurations.middlewares.own.setNotifications(server);
 configurations.middlewares.own.setLoginPromiseToRequest(server);

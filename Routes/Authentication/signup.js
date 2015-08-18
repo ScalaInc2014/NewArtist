@@ -10,12 +10,12 @@ var signupRoutes = function(){
 	
 	//Page for Fan signup
 	router.get('/fan', function(req, res){
-		res.render('./Signup/fan',{ errorMessage : req.flash('error') });
+		res.render('./Signup/fan');
 	});
 
 	//Page for Artist signup
 	router.get('/artist', function(req, res){
-		res.render('./Signup/artist',{ errorMessage : req.flash('error') });
+		res.render('./Signup/artist');
 	});
 
 	/* Get Mail Confirmation from Fans */
@@ -26,14 +26,13 @@ var signupRoutes = function(){
 
 	/* Get Error Authentication */
 	router.get('/confirmation/error', function(req, res){
-		res.render('./Signup/verification_error',{ errorMessage : req.flash('error') });
+		res.render('./Signup/verification_error');
 	});
 
 	/* Get Mail Verification */
 	router.get('/confirmation/sent', function(req, res){
-		res.render('./Signup/mail_verification',{ errorMessage : req.flash('error') });
+		res.render('./Signup/mail_verification');
 	});
-	
 	/////***** POST REQUEST ****** ////////////
 	
 	//POST Fan signup data
